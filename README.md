@@ -1,6 +1,6 @@
 # NCR Voyix Inventory Health Dashboard
 
-> A hackathon prototype that predicts stockouts, detects inventory anomalies, and optimizes cross-store transfers to reduce waste and improve inventory accuracy.
+> A hackathon prototype for Chipotle restaurants that predicts stockouts, detects inventory anomalies, and optimizes cross-store transfers to reduce waste and improve inventory accuracy.
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.109-009688?logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Next.js](https://img.shields.io/badge/Next.js-14-black?logo=next.js)](https://nextjs.org/)

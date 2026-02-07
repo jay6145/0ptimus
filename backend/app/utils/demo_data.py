@@ -60,14 +60,14 @@ def generate_demo_data(
         db.query(Store).delete()
         db.commit()
         
-        # 1. Create Stores
-        print(f"🏪 Creating {num_stores} stores...")
+        # 1. Create Stores (Chipotle Athens, GA Locations)
+        print(f"🏪 Creating {num_stores} Chipotle Athens locations...")
         store_data = [
-            {"name": "Atlanta Store", "location": "Atlanta, GA", "latitude": 33.7490, "longitude": -84.3880},
-            {"name": "Boston Store", "location": "Boston, MA", "latitude": 42.3601, "longitude": -71.0589},
-            {"name": "Chicago Store", "location": "Chicago, IL", "latitude": 41.8781, "longitude": -87.6298},
-            {"name": "Denver Store", "location": "Denver, CO", "latitude": 39.7392, "longitude": -104.9903},
-            {"name": "Seattle Store", "location": "Seattle, WA", "latitude": 47.6062, "longitude": -122.3321},
+            {"name": "Chipotle Athens Downtown", "location": "Downtown Athens, GA", "latitude": 33.9519, "longitude": -83.3576},
+            {"name": "Chipotle Athens Eastside", "location": "Eastside Athens, GA", "latitude": 33.9500, "longitude": -83.3400},
+            {"name": "Chipotle Athens West", "location": "West Athens, GA", "latitude": 33.9450, "longitude": -83.3900},
+            {"name": "Chipotle Athens North", "location": "North Athens, GA", "latitude": 33.9650, "longitude": -83.3550},
+            {"name": "Chipotle Athens South", "location": "South Athens, GA", "latitude": 33.9350, "longitude": -83.3600},
         ]
         
         stores = []
@@ -77,48 +77,70 @@ def generate_demo_data(
             stores.append(store)
         db.commit()
         
-        # Calculate store distances
-        print("📏 Calculating store distances...")
-        for i, store1 in enumerate(stores):
-            for j, store2 in enumerate(stores):
-                if i != j:
-                    distance = calculate_distance(
-                        store1.latitude, store1.longitude,
-                        store2.latitude, store2.longitude
-                    )
-                    cost = distance * 0.05  # $0.05 per km
-                    
-                    store_dist = StoreDistance(
-                        from_store_id=store1.id,
-                        to_store_id=store2.id,
-                        distance_km=round(distance, 2),
-                        transfer_cost=round(cost, 2)
-                    )
-                    db.add(store_dist)
+        # Calculate store distances (Athens Chipotle locations - actual distances)
+        print("📏 Setting store distances...")
+        # Distance matrix in miles (converted to km)
+        distance_matrix = {
+            (1, 2): 2.12,  # Downtown to Eastside
+            (1, 3): 3.38,  # Downtown to West
+            (1, 4): 1.28,  # Downtown to North
+            (1, 5): 1.64,  # Downtown to South
+            (2, 3): 5.09,  # Eastside to West
+            (2, 4): 1.99,  # Eastside to North
+            (2, 5): 2.24,  # Eastside to South
+            (3, 4): 4.59,  # West to North
+            (3, 5): 3.0,   # West to South
+            (4, 5): 2.73,  # North to South
+        }
+        
+        for (from_id, to_id), miles in distance_matrix.items():
+            # Convert miles to km
+            distance_km = miles * 1.60934
+            # Transfer cost: $0.50 per mile
+            cost = miles * 0.50
+            
+            # Add both directions
+            store_dist = StoreDistance(
+                from_store_id=from_id,
+                to_store_id=to_id,
+                distance_km=round(distance_km, 2),
+                transfer_cost=round(cost, 2)
+            )
+            db.add(store_dist)
+            
+            # Reverse direction
+            store_dist_reverse = StoreDistance(
+                from_store_id=to_id,
+                to_store_id=from_id,
+                distance_km=round(distance_km, 2),
+                transfer_cost=round(cost, 2)
+            )
+            db.add(store_dist_reverse)
+        
         db.commit()
         
-        # 2. Create SKUs
-        print(f"📦 Creating {num_skus} SKUs...")
+        # 2. Create SKUs (Chipotle Ingredients & Supplies)
+        print(f"📦 Creating {num_skus} Chipotle SKUs...")
         categories = {
-            "Beverages": 40,
-            "Snacks": 35,
+            "Proteins": 30,
+            "Produce": 40,
             "Dairy": 25,
-            "Produce": 20,
-            "Frozen": 20,
-            "Bakery": 15,
-            "Meat": 15,
-            "Household": 30
+            "Grains & Tortillas": 25,
+            "Salsas & Sauces": 20,
+            "Beverages": 25,
+            "Packaging": 20,
+            "Supplies": 15
         }
         
         sku_names = {
-            "Beverages": ["Coca-Cola 12pk", "Pepsi 12pk", "Orange Juice 64oz", "Water 24pk", "Energy Drink"],
-            "Snacks": ["Potato Chips", "Pretzels", "Cookies", "Crackers", "Candy Bar"],
-            "Dairy": ["Milk 1gal", "Yogurt 6pk", "Cheese Block", "Butter 1lb", "Eggs Dozen"],
-            "Produce": ["Bananas", "Apples", "Lettuce", "Tomatoes", "Carrots"],
-            "Frozen": ["Ice Cream", "Frozen Pizza", "Frozen Vegetables", "Frozen Chicken", "Frozen Fries"],
-            "Bakery": ["Bread Wheat", "Bread White", "Bagels", "Muffins", "Donuts"],
-            "Meat": ["Ground Beef", "Chicken Breast", "Pork Chops", "Steak", "Bacon"],
-            "Household": ["Paper Towels", "Toilet Paper", "Dish Soap", "Laundry Detergent", "Trash Bags"]
+            "Proteins": ["Chicken Breast (Raw)", "Steak (Carne Asada)", "Carnitas Pork", "Barbacoa Beef", "Sofritas (Tofu)"],
+            "Produce": ["Romaine Lettuce", "Cilantro (Fresh)", "White Onions", "Red Onions", "Jalapeños", "Bell Peppers (Green)", "Bell Peppers (Red)", "Limes", "Avocados (Hass)", "Tomatoes (Roma)"],
+            "Dairy": ["Sour Cream", "Shredded Cheese (Monterey Jack)", "Shredded Cheese (Cheddar)", "Queso Blanco", "Milk (Whole)"],
+            "Grains & Tortillas": ["White Rice (Bulk)", "Brown Rice (Bulk)", "Black Beans (Canned)", "Pinto Beans (Canned)", "Flour Tortillas (Burrito)", "Corn Tortillas (Tacos)", "Tortilla Chips"],
+            "Salsas & Sauces": ["Mild Tomato Salsa", "Medium Tomatillo Salsa", "Hot Tomatillo Salsa", "Corn Salsa", "Chipotle Honey Vinaigrette", "Guacamole (Prepared)"],
+            "Beverages": ["Coca-Cola Syrup", "Sprite Syrup", "Iced Tea (Unsweetened)", "Lemonade Mix", "Agua Fresca Mix", "Cups (32oz)", "Cups (21oz)", "Lids (Large)", "Straws"],
+            "Packaging": ["Burrito Foil Wrap", "Bowl Containers", "Salad Containers", "Bag (To-Go)", "Napkins", "Forks", "Spoons", "Knives"],
+            "Supplies": ["Gloves (Nitrile)", "Cleaning Solution", "Paper Towels", "Trash Bags", "Sanitizer Wipes"]
         }
         
         skus = []
@@ -129,10 +151,28 @@ def generate_demo_data(
                 if sku_count >= num_skus:
                     break
                     
-                name = f"{random.choice(base_names)} {random.choice(['Brand A', 'Brand B', 'Brand C', 'Generic'])}"
-                cost = round(random.uniform(1.0, 20.0), 2)
-                price = round(cost * random.uniform(1.3, 2.0), 2)
-                is_perishable = category in ["Produce", "Dairy", "Meat", "Bakery"]
+                # Generate realistic Chipotle SKU names
+                base_name = random.choice(base_names)
+                name = base_name
+                
+                # Realistic costs for restaurant ingredients
+                cost_ranges = {
+                    "Proteins": (8.0, 25.0),
+                    "Produce": (2.0, 15.0),
+                    "Dairy": (3.0, 12.0),
+                    "Grains & Tortillas": (1.5, 8.0),
+                    "Salsas & Sauces": (2.0, 10.0),
+                    "Beverages": (0.5, 5.0),
+                    "Packaging": (0.1, 2.0),
+                    "Supplies": (0.5, 3.0)
+                }
+                
+                cost_range = cost_ranges.get(category, (1.0, 10.0))
+                cost = round(random.uniform(*cost_range), 2)
+                price = round(cost * random.uniform(1.5, 3.0), 2)  # Restaurant markup
+                
+                # Perishable items for Chipotle
+                is_perishable = category in ["Proteins", "Produce", "Dairy", "Salsas & Sauces"]
                 
                 sku = SKU(
                     name=name,
@@ -149,10 +189,10 @@ def generate_demo_data(
         db.commit()
         print(f"✅ Created {len(skus)} SKUs")
         
-        # 3. Create Suppliers
+        # 3. Create Suppliers (Chipotle Suppliers)
         print("🚚 Creating suppliers...")
         suppliers = []
-        supplier_names = ["Sysco", "US Foods", "Coca-Cola Distributor", "PepsiCo", "Local Farms"]
+        supplier_names = ["Sysco Foodservice", "US Foods", "Local Farms Co-op", "Coca-Cola Foodservice", "Produce Distributors Inc"]
         for name in supplier_names:
             supplier = Supplier(
                 name=name,
