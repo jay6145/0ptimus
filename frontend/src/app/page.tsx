@@ -34,10 +34,10 @@ export default function Home() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50 p-8">
+      <main className="min-h-screen bg-ncr-gray-50 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ncr-primary mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading inventory data...</p>
           </div>
         </div>
@@ -65,14 +65,14 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-ncr-gray-50">
       {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-8 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">
+      <div className="bg-gradient-purple text-white">
+        <div className="max-w-7xl mx-auto px-8 py-8">
+          <h1 className="text-4xl font-bold mb-2">
             NCR Voyix Inventory Health Dashboard
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-purple-100 text-lg">
             Predictive inventory management with anomaly detection
           </p>
         </div>
@@ -82,7 +82,7 @@ export default function Home() {
         {/* Alerts Bar */}
         {data && data.alerts && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+           <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-red-500 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-red-600 font-medium">Critical Stockouts</p>
@@ -96,7 +96,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+            <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-yellow-500 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-yellow-600 font-medium">Low Confidence</p>
@@ -110,13 +110,13 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-ncr-primary hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-blue-600 font-medium">Transfer Opportunities</p>
-                  <p className="text-2xl font-bold text-blue-700">{data.alerts.transfer_opportunities}</p>
+                  <p className="text-sm text-ncr-primary font-semibold uppercase tracking-wide">Transfer Opportunities</p>
+                  <p className="text-2xl font-bold text-ncr-primary">{data.alerts.transfer_opportunities}</p>
                 </div>
-                <div className="text-blue-400">
+                <div className="text-ncr-primary">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M8 5a1 1 0 100 2h5.586l-1.293 1.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L13.586 5H8zM12 15a1 1 0 100-2H6.414l1.293-1.293a1 1 0 10-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L6.414 15H12z" />
                   </svg>
@@ -135,7 +135,7 @@ export default function Home() {
                   type="checkbox"
                   checked={riskOnly}
                   onChange={(e) => setRiskOnly(e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded border-ncr-gray-300 text-ncr-primary focus:ring-ncr-primary"
                 />
                 <span className="ml-2 text-sm text-gray-700">Show high-risk items only</span>
               </label>
@@ -143,7 +143,7 @@ export default function Home() {
             <div className="flex space-x-2">
               <Link
                 href="/transfers"
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                className="px-6 py-3 bg-gradient-purple text-white rounded-lg hover:bg-gradient-purple-dark transition-all font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               >
                 View Transfers
               </Link>
@@ -161,17 +161,17 @@ export default function Home() {
         <div className="bg-white rounded-lg shadow overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+              <thead className="bg-ncr-gray-100">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Store</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">On Hand</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Demand/Day</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days Cover</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stockout Date</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Confidence</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Risk</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-ncr-dark uppercase tracking-wider">Store</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-ncr-dark uppercase tracking-wider">SKU</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-ncr-dark uppercase tracking-wider">On Hand</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-ncr-dark uppercase tracking-wider">Demand/Day</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-ncr-dark uppercase tracking-wider">Days Cover</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-ncr-dark uppercase tracking-wider">Stockout Date</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-ncr-dark uppercase tracking-wider">Confidence</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-ncr-dark uppercase tracking-wider">Risk</th>
+                  <th className="px-6 py-4 text-left text-xs font-bold text-ncr-dark uppercase tracking-wider">Action</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -181,7 +181,7 @@ export default function Home() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Link
                         href={`/sku/${item.store_id}/${item.sku_id}`}
-                        className="text-sm text-blue-600 hover:underline"
+                        className="text-sm text-ncr-primary hover:text-ncr-primary-dark hover:underline font-medium"
                       >
                         {item.sku_name}
                       </Link>
