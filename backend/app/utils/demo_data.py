@@ -63,11 +63,11 @@ def generate_demo_data(
         # 1. Create Stores
         print(f"🏪 Creating {num_stores} stores...")
         store_data = [
-            {"name": "Atlanta Store", "location": "Atlanta, GA", "lat": 33.7490, "lon": -84.3880},
-            {"name": "Boston Store", "location": "Boston, MA", "lat": 42.3601, "lon": -71.0589},
-            {"name": "Chicago Store", "location": "Chicago, IL", "lat": 41.8781, "lon": -87.6298},
-            {"name": "Denver Store", "location": "Denver, CO", "lat": 39.7392, "lon": -104.9903},
-            {"name": "Seattle Store", "location": "Seattle, WA", "lat": 47.6062, "lon": -122.3321},
+            {"name": "Atlanta Store", "location": "Atlanta, GA", "latitude": 33.7490, "longitude": -84.3880},
+            {"name": "Boston Store", "location": "Boston, MA", "latitude": 42.3601, "longitude": -71.0589},
+            {"name": "Chicago Store", "location": "Chicago, IL", "latitude": 41.8781, "longitude": -87.6298},
+            {"name": "Denver Store", "location": "Denver, CO", "latitude": 39.7392, "longitude": -104.9903},
+            {"name": "Seattle Store", "location": "Seattle, WA", "latitude": 47.6062, "longitude": -122.3321},
         ]
         
         stores = []
