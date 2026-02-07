@@ -51,11 +51,11 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50 p-8">
+      <main className="min-h-screen bg-ncr-gray-50 p-8">
         <div className="max-w-4xl mx-auto">
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading statistics...</p>
+           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ncr-primary mx-auto"></div>
+           <p className="mt-4 text-ncr-gray-600">Loading statistics...</p>
           </div>
         </div>
       </main>
@@ -63,20 +63,20 @@ export default function AdminPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-ncr-gray-50">
       {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-4xl mx-auto px-8 py-6">
+      <div className="bg-gradient-purple text-white">
+        <div className="max-w-4xl mx-auto px-8 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Data Administration</h1>
-              <p className="text-gray-600 mt-1">
+              <h1 className="text-4xl font-bold mb-2">Data Administration</h1>
+              <p className="text-purple-100 text-lg">
                 Manage demo data and view system statistics
               </p>
             </div>
             <Link
               href="/"
-              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+              className="px-6 py-3 bg-white text-ncr-primary rounded-lg hover:bg-ncr-gray-100 transition-colors font-semibold shadow-lg"
             >
               ← Back to Overview
             </Link>
@@ -92,42 +92,42 @@ export default function AdminPage() {
         )}
 
         {/* Database Statistics */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Database Statistics</h2>
+        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+          <h2 className="text-2xl font-semibold text-ncr-dark- mb-6">Database Statistics</h2>
           
           {stats && (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <div className="border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">Stores</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.stores}</p>
+              <div className="border-l-4 border-ncr-primary bg-ncr-primary-pale rounded-r-lg p-4">
+                <p className="text-xs text-ncr-primary font-semibold uppercase tracking-wide mb-1">Stores</p>
+                <p className="text-3xl font-bold text-ncr-dark">{stats.stores}</p>
               </div>
-              <div className="border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">SKUs</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.skus}</p>
+              <div className="border-l-4 border-ncr-secondary bg-purple-50 rounded-r-lg p-4">
+                <p className="text-xs text-ncr-secondary font-semibold uppercase tracking-wide mb-1">SKUs</p>
+                <p className="text-3xl font-bold text-ncr-dark">{stats.skus}</p>
               </div>
-              <div className="border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">Inventory Snapshots</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.inventory_snapshots.toLocaleString()}</p>
+              <div className="border-l-4 border-blue-500 bg-blue-50 rounded-r-lg p-4">
+                <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide mb-1">Inventory Snapshots</p>
+                <p className="text-3xl font-bold text-ncr-dark">{stats.inventory_snapshots.toLocaleString()}</p>
               </div>
-              <div className="border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">Sales Records</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.sales_records.toLocaleString()}</p>
+              <div className="border-l-4 border-green-500 bg-green-50 rounded-r-lg p-4">
+                <p className="text-xs text-green-600 font-semibold uppercase tracking-wide mb-1">Sales Records</p>
+                <p className="text-2xl font-bold text-ncr-dark">{stats.sales_records.toLocaleString()}</p>
               </div>
-              <div className="border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">Anomalies Detected</p>
-                <p className="text-2xl font-bold text-red-600">{stats.anomalies}</p>
+              <div className="border-l-4 border-red-500 bg-red-50 rounded-r-lg p-4">
+                <p className="text-xs text-red-600 font-semibold uppercase tracking-wide mb-1">Anomalies Detected</p>
+                <p className="text-3xl font-bold text-red-600">{stats.anomalies}</p>
               </div>
-              <div className="border rounded-lg p-4">
-                <p className="text-sm text-gray-600 mb-1">Transfer Recommendations</p>
-                <p className="text-2xl font-bold text-blue-600">{stats.transfer_recommendations}</p>
+              <div className="border-l-4 border-ncr-primary bg-ncr-primary-pale rounded-r-lg p-4">
+                <p className="text-xs text-ncr-primary font-semibold uppercase tracking-wide mb-1">Transfer Recommendations</p>
+                <p className="text-3xl font-bold text-ncr-primary">{stats.transfer_recommendations}</p>
               </div>
             </div>
           )}
 
           {stats?.date_range && (
-            <div className="mt-4 pt-4 border-t">
-              <p className="text-sm text-gray-600">
-                <span className="font-medium">Data Range:</span>{' '}
+            <div className="mt-6 pt-4 border-t border-ncr-gray-200">
+              <p className="text-sm text-ncr-gray-700">
+                <span className="font-semibold text-ncr-dark">Data Range:</span>{' '}
                 {new Date(stats.date_range.start).toLocaleDateString()} to{' '}
                 {new Date(stats.date_range.end).toLocaleDateString()}{' '}
                 ({stats.date_range.days} days)
@@ -137,10 +137,10 @@ export default function AdminPage() {
         </div>
 
         {/* Demo Data Generator */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Demo Data Generator</h2>
+        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+          <h2 className="text-2xl font-bold text-ncr-dark mb-6">Demo Data Generator</h2>
           
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 rounded-r-lg p-4 mb-6">
             <div className="flex">
               <div className="flex-shrink-0">
                 <svg className="h-5 w-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
@@ -148,7 +148,7 @@ export default function AdminPage() {
                 </svg>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-yellow-800">Warning</h3>
+                <h3 className="text-sm font-bold text-yellow-800">Warning</h3>
                 <p className="mt-1 text-sm text-yellow-700">
                   Regenerating demo data will delete all existing data and create new synthetic data.
                   This action cannot be undone.
@@ -174,7 +174,7 @@ export default function AdminPage() {
             <button
               onClick={regenerateData}
               disabled={regenerating}
-              className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-medium"
+              className="w-full px-6 py-4 bg-gradient-purple text-white rounded-lg hover:bg-gradient-purple-dark disabled:bg-ncr-gray-400 disabled:cursor-not-allowed font-bold text-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5"
             >
               {regenerating ? (
                 <span className="flex items-center justify-center">
@@ -192,8 +192,8 @@ export default function AdminPage() {
         </div>
 
         {/* API Information */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">API Information</h2>
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-2xl font-bold text-ncr-dark mb-6">API Information</h2>
           
           <div className="space-y-3">
             <div>
@@ -202,7 +202,7 @@ export default function AdminPage() {
                 href="http://localhost:8000/docs"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline text-sm"
+                className="text-ncr-primary hover:text-ncr-primary-dark hover:underline text-sm font-medium"
               >
                 http://localhost:8000/docs
               </a>

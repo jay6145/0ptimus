@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .database import init_db, SessionLocal
-from .api import overview, sku, transfers, demo
+from .api import overview, sku, transfers, demo, peak_hours
 
 # Create FastAPI app
 app = FastAPI(
@@ -31,6 +31,7 @@ app.include_router(overview.router, prefix="/api", tags=["overview"])
 app.include_router(sku.router, prefix="/api", tags=["sku"])
 app.include_router(transfers.router, prefix="/api", tags=["transfers"])
 app.include_router(demo.router, prefix="/api", tags=["demo"])
+app.include_router(peak_hours.router, prefix="/api", tags=["peak-hours"])
 
 
 @app.on_event("startup")

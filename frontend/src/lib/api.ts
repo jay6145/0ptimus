@@ -7,7 +7,8 @@ import type {
   SKUDetail,
   TransferRecommendationsResponse,
   Transfer,
-  DemoStats
+  DemoStats,
+  PeakHoursDashboard
 } from './types';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -115,6 +116,19 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(params || {}),
     });
+  },
+
+  // Peak hours endpoints
+  async getPeakHoursDashboard(storeId: number): Promise<PeakHoursDashboard> {
+    return fetchAPI<PeakHoursDashboard>(`/api/peak-hours/${storeId}`);
+  },
+
+  async getPrepSchedule(storeId: number, prepLeadTime = 2) {
+    return fetchAPI(`/api/prep-schedule/${storeId}?prep_lead_time=${prepLeadTime}`);
+  },
+
+  async getSKUHourlyForecast(storeId: number, skuId: number) {
+    return fetchAPI(`/api/sku/${storeId}/${skuId}/hourly`);
   },
 
   // Health check

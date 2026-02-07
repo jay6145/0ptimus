@@ -11,6 +11,8 @@ from .cycle_count import CycleCount
 from .supplier import Supplier, SKUSupplier
 from .anomaly import AnomalyEvent
 from .recommendation import TransferRecommendation, StoreDistance
+from .sales_hourly import SalesHourly
+from .prep_recommendation import PrepRecommendation, InventoryRealtime
 
 __all__ = [
     "Store",
@@ -25,4 +27,7 @@ __all__ = [
     "AnomalyEvent",
     "TransferRecommendation",
     "StoreDistance",
+    "SalesHourly",
+    "PrepRecommendation",
+    "InventoryRealtime",
 ]
