@@ -58,7 +58,6 @@ export default function RootLayout({
         </footer>
       </body>
     </html>
-<<<<<<< HEAD
   );
 }
 
@@ -71,7 +70,4 @@ function NavLink({ href, label }: { href: string; label: string }) {
       {label}
     </Link>
   );
-=======
-  )
->>>>>>> e40dae8c0ad593e9362d9520cb672b98fdfcf2ae
 }
