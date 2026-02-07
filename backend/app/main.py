@@ -4,7 +4,8 @@ FastAPI main application
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
-from .database import init_db
+from .database import init_db, SessionLocal
+from .api import overview, sku, transfers, demo
 
 # Create FastAPI app
 app = FastAPI(
@@ -25,12 +26,36 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Include API routers
+app.include_router(overview.router, prefix="/api", tags=["overview"])
+app.include_router(sku.router, prefix="/api", tags=["sku"])
+app.include_router(transfers.router, prefix="/api", tags=["transfers"])
+app.include_router(demo.router, prefix="/api", tags=["demo"])
+
 
 @app.on_event("startup")
 async def startup_event():
-    """Initialize database on startup"""
+    """Initialize database and generate demo data on startup"""
     init_db()
     print("✅ Database initialized")
+    
+    # Check if demo data exists
+    db = SessionLocal()
+    try:
+        from .models import Store
+        store_count = db.query(Store).count()
+        
+        if store_count == 0:
+            print("📊 No data found. Generating demo data...")
+            from .utils.demo_data import generate_demo_data
+            generate_demo_data()
+            print("✅ Demo data generated successfully")
+        else:
+            print(f"✅ Found existing data ({store_count} stores)")
+    except Exception as e:
+        print(f"⚠️  Error checking/generating demo data: {e}")
+    finally:
+        db.close()
 
 
 @app.get("/api/health")
@@ -49,14 +74,11 @@ async def root():
     return {
         "message": "NCR Voyix Inventory Health Dashboard API",
         "docs": "/docs",
-        "health": "/api/health"
+        "health": "/api/health",
+        "endpoints": {
+            "overview": "/api/overview",
+            "sku_detail": "/api/sku/{store_id}/{sku_id}",
+            "transfers": "/api/transfers/recommendations",
+            "demo_stats": "/api/demo/stats"
+        }
     }
-
-
-# TODO: Include API routers
-# from .api import overview, sku, transfers, demo, auth
-# app.include_router(overview.router, prefix="/api", tags=["overview"])
-# app.include_router(sku.router, prefix="/api", tags=["sku"])
-# app.include_router(transfers.router, prefix="/api", tags=["transfers"])
-# app.include_router(demo.router, prefix="/api", tags=["demo"])
-# app.include_router(auth.router, prefix="/api", tags=["auth"])
