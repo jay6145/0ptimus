@@ -142,20 +142,14 @@ export default function Home() {
             </div>
             <div className="flex space-x-2">
               <Link
-                href="/peak-hours"
-                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium shadow-sm"
-              >
-                ⏰ Peak Hours
-              </Link>
-              <Link
                 href="/transfers"
-                className="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 text-sm font-medium shadow-sm"
+                className="px-6 py-3 bg-gradient-purple text-white rounded-lg hover:bg-gradient-purple-dark transition-all font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               >
                 View Transfers
               </Link>
               <Link
                 href="/admin"
-                className="px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-800 text-sm font-medium shadow-sm"
+                className="px-6 py-3 bg-ncr-gray-700 text-white rounded-lg hover:bg-ncr-gray-800 transition-colors font-bold shadow-md"
               >
                 Admin
               </Link>
@@ -233,4 +227,3 @@ export default function Home() {
     </main>
   );
 }
-

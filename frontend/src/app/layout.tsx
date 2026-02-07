@@ -58,5 +58,20 @@ export default function RootLayout({
         </footer>
       </body>
     </html>
+<<<<<<< HEAD
   );
+}
+
+function NavLink({ href, label }: { href: string; label: string }) {
+  return (
+    <Link
+      href={href}
+      className="px-4 py-2 rounded-lg text-ncr-gray-700 hover:text-ncr-primary hover:bg-ncr-primary-pale transition-colors font-medium"
+    >
+      {label}
+    </Link>
+  );
+=======
+  )
+>>>>>>> e40dae8c0ad593e9362d9520cb672b98fdfcf2ae
 }
