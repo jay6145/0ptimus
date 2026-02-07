@@ -167,6 +167,7 @@ export interface DemoStats {
   skus: number;
   inventory_snapshots: number;
   sales_records: number;
+  total_sales_hourly?: number;
   anomalies: number;
   transfer_recommendations: number;
   date_range?: {
@@ -174,4 +175,74 @@ export interface DemoStats {
     end: string;
     days: number;
   };
+}
+
+export interface HourlyForecast {
+  hour: number;
+  hour_display: string;
+  predicted_demand: number;
+  is_peak_hour: boolean;
+  peak_period: string | null;
+  confidence: string;
+}
+
+export interface StockoutPrediction {
+  will_stockout: boolean;
+  stockout_time?: string;
+  stockout_hour?: number;
+  hours_until_stockout?: number;
+  minutes_until_stockout?: number;
+  is_during_peak?: boolean;
+  peak_period?: string;
+  severity?: string;
+  deficit?: number;
+  safe_until?: string;
+  remaining_at_close?: number;
+}
+
+export interface PrepRecommendation {
+  sku_id: number;
+  sku_name: string;
+  category: string;
+  prep_time: string;
+  prep_time_display: string;
+  qty_to_prep: number;
+  reason: string;
+  priority: string;
+  current_on_hand: number;
+  stockout_time: string;
+  is_peak_stockout: boolean;
+  hours_until_prep: number;
+}
+
+export interface PeakHourSummary {
+  current_time: string;
+  current_hour: number;
+  next_peak_period: string;
+  next_peak_hour: number;
+  hours_until_peak: number;
+  minutes_until_peak: number;
+  is_currently_peak: boolean;
+  at_risk_items: Array<{
+    sku_name: string;
+    stockout_time: string;
+    hours_until: number;
+    peak_period: string;
+  }>;
+  total_at_risk: number;
+}
+
+export interface PeakHoursDashboard {
+  store: Store;
+  summary: PeakHourSummary;
+  prep_schedule: PrepRecommendation[];
+  critical_items: Array<{
+    sku_id: number;
+    sku_name: string;
+    category: string;
+    on_hand: number;
+    stockout_prediction: StockoutPrediction;
+    hourly_forecast: HourlyForecast[];
+  }>;
+  total_prep_tasks: number;
 }

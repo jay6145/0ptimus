@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from ..models import (
     Store, SKU, InventorySnapshot, SalesDaily, ReceiptsDaily,
     Transfer, CycleCount, Supplier, SKUSupplier, AnomalyEvent,
-    TransferRecommendation, StoreDistance
+    TransferRecommendation, StoreDistance, SalesHourly
 )
 from ..database import SessionLocal, engine, Base
 import math
@@ -409,6 +409,75 @@ def generate_demo_data(
         db.commit()
         print("✅ Transfer recommendations created")
         
+        # 8. Generate hourly sales data for peak hour forecasting
+        print("⏰ Generating hourly sales data for last 14 days...")
+        
+        # Peak hour multipliers for Chipotle
+        hour_multipliers = {
+            6: 0.05,   # 6am - Opening prep
+            7: 0.1,    # 7am
+            8: 0.15,   # 8am
+            9: 0.2,    # 9am
+            10: 0.4,   # 10am
+            11: 1.5,   # 11am - LUNCH RUSH START
+            12: 2.2,   # 12pm - PEAK LUNCH
+            13: 1.8,   # 1pm - LUNCH RUSH
+            14: 0.9,   # 2pm
+            15: 0.5,   # 3pm
+            16: 0.6,   # 4pm
+            17: 1.4,   # 5pm - DINNER RUSH START
+            18: 2.0,   # 6pm - PEAK DINNER
+            19: 1.7,   # 7pm - DINNER RUSH
+            20: 1.1,   # 8pm
+            21: 0.6,   # 9pm
+            22: 0.2,   # 10pm - Closing
+        }
+        
+        # Generate hourly data for last 14 days only (to keep it manageable)
+        hourly_start_date = datetime.now() - timedelta(days=14)
+        
+        for store in stores:
+            # Focus on high-demand items for hourly tracking
+            hourly_skus = [s for s in skus if s.category in ["Proteins", "Salsas & Sauces", "Produce"]]
+            
+            for sku in hourly_skus[:30]:  # Limit to 30 SKUs for performance
+                # Base hourly demand
+                base_hourly_demand = {
+                    "Proteins": random.uniform(2, 8),
+                    "Salsas & Sauces": random.uniform(1, 5),
+                    "Produce": random.uniform(1, 4)
+                }.get(sku.category, 1)
+                
+                for day_offset in range(14):
+                    current_date = hourly_start_date + timedelta(days=day_offset)
+                    day_of_week = current_date.weekday()
+                    
+                    # Weekend multiplier
+                    weekend_mult = 1.2 if day_of_week >= 5 else 1.0
+                    
+                    for hour, multiplier in hour_multipliers.items():
+                        # Calculate hourly sales
+                        hourly_sales = int(
+                            base_hourly_demand * multiplier * weekend_mult * random.uniform(0.8, 1.2)
+                        )
+                        
+                        if hourly_sales > 0:
+                            is_peak = hour in [11, 12, 13, 17, 18, 19]
+                            
+                            sales_hour = SalesHourly(
+                                store_id=store.id,
+                                sku_id=sku.id,
+                                ts_datetime=current_date.replace(hour=hour, minute=0),
+                                qty_sold=hourly_sales,
+                                hour_of_day=hour,
+                                day_of_week=day_of_week,
+                                is_peak_hour=is_peak
+                            )
+                            db.add(sales_hour)
+        
+        db.commit()
+        print("✅ Hourly sales data generated")
+        
         # Summary
         stats = {
             "stores": len(stores),
@@ -416,6 +485,7 @@ def generate_demo_data(
             "days_history": days_history,
             "total_snapshots": db.query(InventorySnapshot).count(),
             "total_sales": db.query(SalesDaily).count(),
+            "total_sales_hourly": db.query(SalesHourly).count(),
             "total_receipts": db.query(ReceiptsDaily).count(),
             "anomalies": db.query(AnomalyEvent).count(),
             "cycle_counts": db.query(CycleCount).count(),
