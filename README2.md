@@ -58,7 +58,6 @@ The current version runs with **synthetic demo data** (no real POS or ERP). It i
 | Problem | What We Do |
 |--------|------------|
 | **Stockouts** | Predict when items will run out (days and hours) and suggest transfers or prep. |
-| **Phantom inventory** | Detect when records don’t match reality (shrink, errors) and score “confidence.” |
 | **Waste and extra orders** | Prefer moving stock between stores over new purchase orders when possible. |
 | **Peak-hour surprises** | Show hourly demand and prep schedules so staff can prep before rushes. |
 | **Equipment failures** | (Optional) Show cooler/freezer temps from IoT sensors and flag critical readings. |
