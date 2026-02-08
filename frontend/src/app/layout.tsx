@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'NCR Voyix Inventory Health Dashboard',
+  title: 'Optimus Inventory Health Dashboard',
   description: 'Predictive inventory management with anomaly detection',
 };
 
@@ -22,7 +22,7 @@ export default function RootLayout({
               {/* Logo */}
               <Link href="/" className="flex items-center">
                 <img 
-                  src="/images/ncr-voyix-og.svg" 
+                  src="/images/optimus.svg" 
                   alt="NCR Voyix" 
                   className="h-6"
                 />
@@ -44,7 +44,7 @@ export default function RootLayout({
         <footer className="bg-white border-t border-ncr-gray-200 mt-12">
           <div className="max-w-7xl mx-auto px-8 py-6">
             <div className="flex items-center justify-between text-sm text-ncr-gray-600">
-              <p>© 2026 NCR Voyix Corporation</p>
+              <p>© 2026 Optimus Corporation</p>
               <p className="text-ncr-primary font-semibold">UGAHacks 11</p>
             </div>
           </div>

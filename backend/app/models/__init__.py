@@ -13,6 +13,7 @@ from .anomaly import AnomalyEvent
 from .recommendation import TransferRecommendation, StoreDistance
 from .sales_hourly import SalesHourly
 from .prep_recommendation import PrepRecommendation, InventoryRealtime
+from .telemetry import Telemetry
 
 __all__ = [
     "Store",
@@ -30,4 +31,5 @@ __all__ = [
     "SalesHourly",
     "PrepRecommendation",
     "InventoryRealtime",
+    "Telemetry",
 ]
