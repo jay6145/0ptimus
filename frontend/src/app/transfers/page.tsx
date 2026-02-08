@@ -3,11 +3,12 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import type { TransferRecommendationsResponse, TransferRecommendation } from '@/lib/types';
+import type { TransferRecommendationsResponse, TransferRecommendation, Transfer } from '@/lib/types';
 import { formatNumber, formatCurrency } from '@/lib/utils';
 
 export default function TransfersPage() {
   const [data, setData] = useState<TransferRecommendationsResponse | null>(null);
+  const [transfers, setTransfers] = useState<Transfer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [creating, setCreating] = useState<number | null>(null);
@@ -19,8 +20,12 @@ export default function TransfersPage() {
   async function loadData() {
     try {
       setLoading(true);
-      const response = await api.getTransferRecommendations({ min_urgency: 0.5 });
-      setData(response);
+      const [recsResponse, transfersResponse] = await Promise.all([
+        api.getTransferRecommendations({ min_urgency: 0.5 }),
+        api.getTransfers({ limit: 50 })
+      ]);
+      setData(recsResponse);
+      setTransfers(transfersResponse.transfers);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load data');
@@ -57,6 +62,22 @@ export default function TransfersPage() {
     if (score >= 0.8) return 'High';
     if (score >= 0.6) return 'Medium';
     return 'Low';
+  }
+
+  function getStatusStyle(status: string): string {
+    switch (status) {
+      case 'draft': return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'approved': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'in_transit': return 'bg-amber-100 text-amber-800 border-amber-200';
+      case 'received': return 'bg-green-100 text-green-800 border-green-200';
+      case 'cancelled': return 'bg-red-100 text-red-800 border-red-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  }
+
+  function formatDate(iso: string): string {
+    const d = new Date(iso);
+    return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
   if (loading) {
@@ -219,6 +240,56 @@ export default function TransfersPage() {
             <p className="text-gray-600">All stores have balanced inventory levels</p>
           </div>
         )}
+
+        {/* Created transfers */}
+        <div className="mt-10">
+          <h2 className="text-xl font-bold text-ncr-dark mb-2">Created Transfers</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Transfers you created from recommendations. Impact: improves days of cover at the receiving store and reduces stockout risk.
+          </p>
+          {transfers.length === 0 ? (
+            <div className="bg-white rounded-lg shadow p-8 text-center border border-gray-200">
+              <p className="text-gray-500">No transfers yet. Create one from a recommendation above.</p>
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl shadow-md overflow-hidden">
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">SKU</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">From → To</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Qty</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Created</th>
+                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wide">Impact</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {transfers.map((t) => (
+                      <tr key={t.id} className="hover:bg-gray-50/50">
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">{t.sku_name}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          {t.from_store_name} → {t.to_store_name}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-900">{t.qty} units</td>
+                        <td className="px-6 py-4">
+                          <span className={`px-2 py-1 text-xs font-medium rounded border ${getStatusStyle(t.status)}`}>
+                            {t.status.replace('_', ' ')}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">{formatDate(t.created_at)}</td>
+                        <td className="px-6 py-4 text-sm text-gray-600">
+                          Improves stock at <span className="font-medium text-gray-900">{t.to_store_name}</span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );
