@@ -237,8 +237,8 @@ def generate_demo_data(
         
         for store in stores:
             for sku in skus:
-                # Initialize inventory
-                initial_inventory = random.randint(20, 100)
+                # Initialize inventory (higher = fewer critical stockouts in demo)
+                initial_inventory = random.randint(45, 130)
                 inventory_tracker[(store.id, sku.id)] = initial_inventory
                 
                 # Base demand varies by category and store
@@ -281,10 +281,10 @@ def generate_demo_data(
                     # Update inventory
                     inventory_tracker[(store.id, sku.id)] -= daily_sales
                     
-                    # Receive shipments periodically
+                    # Receive shipments periodically (more = fewer critical)
                     receipts = 0
-                    if random.random() < 0.15:  # 15% chance of receipt
-                        receipts = int(base_demand * random.uniform(5, 10))
+                    if random.random() < 0.20:  # 20% chance of receipt
+                        receipts = int(base_demand * random.uniform(6, 12))
                         receipt = ReceiptsDaily(
                             store_id=store.id,
                             sku_id=sku.id,
@@ -310,10 +310,10 @@ def generate_demo_data(
         print("⚠️  Injecting anomalies...")
         anomaly_count = 0
         
-        # Select random store/sku combinations for anomalies
+        # Select random store/sku combinations for anomalies (fewer = less critical noise)
         anomaly_targets = random.sample(
             [(s.id, sk.id) for s in stores for sk in random.sample(skus, 10)],
-            min(15, len(stores) * 10)
+            min(8, len(stores) * 6)
         )
         
         for store_id, sku_id in anomaly_targets:
@@ -328,9 +328,9 @@ def generate_demo_data(
             ).first()
             
             if snapshot:
-                # Create unexplained drop
-                residual = -random.randint(5, 20)
-                severity = "critical" if residual < -15 else "high" if residual < -10 else "medium"
+                # Create unexplained drop (smaller range = fewer critical)
+                residual = -random.randint(3, 12)
+                severity = "critical" if residual < -10 else "high" if residual < -7 else "medium"
                 
                 explanation = f"Unexplained inventory drop of {abs(residual)} units. Possible shrink or unrecorded transaction."
                 
@@ -382,10 +382,10 @@ def generate_demo_data(
         
         # 7. Create transfer opportunities
         print("🔄 Creating transfer scenarios...")
-        # Find SKUs with imbalanced inventory
+        # Find SKUs with imbalanced inventory (stricter = fewer recommendations)
         today = datetime.now().date()
         
-        for sku in random.sample(skus, min(20, len(skus))):
+        for sku in random.sample(skus, min(12, len(skus))):
             store_inventories = []
             for store in stores:
                 snapshot = db.query(InventorySnapshot).filter(
@@ -401,18 +401,18 @@ def generate_demo_data(
                 # Sort by inventory level
                 store_inventories.sort(key=lambda x: x[1])
                 
-                # If there's significant imbalance, create recommendation
-                if store_inventories[-1][1] > store_inventories[0][1] * 3:
+                # If there's significant imbalance (stricter: 5x ratio = fewer critical)
+                if store_inventories[-1][1] > store_inventories[0][1] * 5:
                     from_store_id = store_inventories[-1][0]
                     to_store_id = store_inventories[0][0]
-                    qty = min(20, store_inventories[-1][1] // 4)
+                    qty = min(15, store_inventories[-1][1] // 5)
                     
                     recommendation = TransferRecommendation(
                         from_store_id=from_store_id,
                         to_store_id=to_store_id,
                         sku_id=sku.id,
                         qty=qty,
-                        urgency_score=random.uniform(0.6, 0.95),
+                        urgency_score=random.uniform(0.5, 0.78),
                         rationale=f"Receiver has low stock ({store_inventories[0][1]} units), donor has excess ({store_inventories[-1][1]} units). Transfer prevents stockout.",
                         status="pending"
                     )
