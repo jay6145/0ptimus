@@ -12,6 +12,9 @@ def post(api_url, store_id, sensor, value, unit=None):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", default="/dev/cu.usbmodem101")
+    # COM7 for Windows, /dev/cu.usbmodem101 for macOS, adjust as needed
+    # pip3 install pyserial requests
+    # python3 -m serial.tools.list_ports
     ap.add_argument("--baud", type=int, default=9600)
     ap.add_argument("--store-id", type=int, default=1)
     ap.add_argument("--api", default="http://localhost:8000/api/telemetry")
