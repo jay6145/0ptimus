@@ -251,7 +251,13 @@ export default function PeakHoursPage() {
         {/* Critical Items Overview */}
         <div className="bg-white rounded-xl shadow-md p-6">
           <h2 className="text-2xl font-bold text-ncr-dark mb-4">Critical Items - Hourly Forecast</h2>
-          
+          {(!data?.critical_items || data.critical_items.length === 0) && (
+            <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border border-gray-200">
+              <p className="font-medium mb-2">No critical items or hourly data yet</p>
+              <p className="text-sm mb-4">Regenerate demo data to populate hourly sales and see forecasts here.</p>
+              <Link href="/admin" className="text-ncr-primary font-semibold hover:underline">Go to Admin → Regenerate Demo Data</Link>
+            </div>
+          )}
           <div className="space-y-6">
             {data?.critical_items.slice(0, 5).map((item, idx) => (
               <div key={idx} className="border rounded-lg p-4">
@@ -272,27 +278,34 @@ export default function PeakHoursPage() {
 
                 {/* Simple hourly bar chart */}
                 <div className="mt-4">
-                  <div className="flex items-end space-x-1 h-24">
+                  {(!item.hourly_forecast || item.hourly_forecast.length === 0) ? (
+                    <p className="text-sm text-gray-500 py-4 text-center">No hourly data yet. Regenerate demo data to populate.</p>
+                  ) : (
+                  <div className="flex items-end gap-0.5 h-32">
                     {item.hourly_forecast.map((forecast, fIdx) => {
-                      const maxDemand = Math.max(...item.hourly_forecast.map(f => f.predicted_demand));
-                      const height = (forecast.predicted_demand / maxDemand) * 100;
+                      const maxDemand = Math.max(1, ...item.hourly_forecast.map(f => f.predicted_demand));
+                      const rawHeight = (forecast.predicted_demand / maxDemand) * 100;
+                      const height = forecast.predicted_demand > 0 ? Math.max(8, Math.min(100, rawHeight)) : 0;
                       
                       return (
-                        <div key={fIdx} className="flex-1 flex flex-col items-center">
-                          <div
-                            className={`w-full rounded-t ${
-                              forecast.is_peak_hour 
-                                ? 'bg-orange-500' 
-                                : 'bg-ncr-primary'
-                            }`}
-                            style={{ height: `${height}%` }}
-                            title={`${forecast.hour_display}: ${forecast.predicted_demand} units`}
-                          ></div>
-                          <p className="text-xs text-gray-600 mt-1">{forecast.hour_display}</p>
+                        <div key={fIdx} className="flex-1 flex flex-col items-center min-w-0 h-full">
+                          <div className="flex-1 w-full min-h-0 flex flex-col justify-end">
+                            <div
+                              className={`w-full rounded-t min-h-[4px] ${
+                                forecast.is_peak_hour 
+                                  ? 'bg-orange-500' 
+                                  : 'bg-ncr-primary'
+                              }`}
+                              style={{ height: `${height}%` }}
+                              title={`${forecast.hour_display}: ${forecast.predicted_demand} units`}
+                            />
+                          </div>
+                          <p className="text-[10px] text-gray-600 mt-1 truncate w-full text-center">{forecast.hour_display}</p>
                         </div>
                       );
                     })}
                   </div>
+                  )}
                   <div className="flex items-center justify-center space-x-4 mt-2 text-xs">
                     <div className="flex items-center">
                       <div className="w-3 h-3 bg-ncr-primary rounded mr-1"></div>
