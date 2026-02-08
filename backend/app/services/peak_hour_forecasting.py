@@ -6,12 +6,17 @@ from typing import Dict, List, Optional
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from ..models import SalesHourly, InventorySnapshot, SKU, PrepRecommendation
+from functools import lru_cache
 
 
 # Peak hour definitions for Chipotle
 LUNCH_HOURS = [11, 12, 13]  # 11am-2pm
 DINNER_HOURS = [17, 18, 19]  # 5pm-8pm
 PEAK_HOURS = LUNCH_HOURS + DINNER_HOURS
+
+# Simple in-memory cache for hourly forecasts (TTL: 5 minutes)
+_forecast_cache = {}
+_cache_ttl = 300  # 5 minutes
 
 
 def is_peak_hour(hour: int) -> bool:
@@ -39,7 +44,15 @@ def calculate_hourly_demand_forecast(
     """
     Predict demand for specific hour based on historical patterns
     Uses last N weeks of data for the same hour/day combination
+    WITH CACHING for performance
     """
+    # Check cache
+    cache_key = f"{store_id}_{sku_id}_{target_hour}_{target_day_of_week}"
+    if cache_key in _forecast_cache:
+        cached_data, cached_time = _forecast_cache[cache_key]
+        if (datetime.now() - cached_time).total_seconds() < _cache_ttl:
+            return cached_data
+    
     # Get historical sales for this hour/day combination
     historical_sales = db.query(SalesHourly).filter(
         SalesHourly.store_id == store_id,
@@ -57,13 +70,15 @@ def calculate_hourly_demand_forecast(
         ).order_by(SalesHourly.ts_datetime.desc()).limit(lookback_weeks).all()
     
     if not historical_sales:
-        return {
+        result = {
             "predicted_demand": 0.0,
             "confidence": "low",
             "is_peak_hour": is_peak_hour(target_hour),
             "peak_period": get_peak_period_name(target_hour),
             "data_points": 0
         }
+        _forecast_cache[cache_key] = (result, datetime.now())
+        return result
     
     # Weighted average (recent weeks weighted higher)
     weights = [0.95 ** i for i in range(len(historical_sales))]
@@ -83,13 +98,18 @@ def calculate_hourly_demand_forecast(
     confidence = "high" if len(historical_sales) >= 6 else \
                  "medium" if len(historical_sales) >= 3 else "low"
     
-    return {
+    result = {
         "predicted_demand": round(predicted, 1),
         "confidence": confidence,
         "is_peak_hour": is_peak,
         "peak_period": get_peak_period_name(target_hour),
         "data_points": len(historical_sales)
     }
+    
+    # Cache result
+    _forecast_cache[cache_key] = (result, datetime.now())
+    
+    return result
 
 
 def predict_stockout_time(
@@ -148,16 +168,17 @@ def generate_prep_schedule(
     """
     Generate prep schedule for the day based on hourly forecasts
     Focuses on critical items that might run out during peak hours
+    OPTIMIZED: Limits queries and uses caching
     """
     if target_date is None:
         target_date = datetime.now()
     
     recommendations = []
     
-    # Focus on high-demand perishable items
+    # Focus on high-demand perishable items - LIMIT TO 5 FOR PERFORMANCE
     critical_skus = db.query(SKU).filter(
         SKU.category.in_(["Proteins", "Salsas & Sauces", "Produce"])
-    ).limit(10).all()  # Limit to top 10 to avoid performance issues
+    ).limit(5).all()  # Reduced from 10 to 5 for speed
     
     for sku in critical_skus:
         # Get current inventory
@@ -167,6 +188,10 @@ def generate_prep_schedule(
         ).order_by(InventorySnapshot.ts_date.desc()).first()
         
         current_inv = latest_snapshot.on_hand if latest_snapshot else 0
+        
+        # Skip if plenty of inventory (optimization)
+        if current_inv > 100:
+            continue
         
         # Predict stockout time
         stockout_pred = predict_stockout_time(
@@ -180,9 +205,9 @@ def generate_prep_schedule(
             
             # Only recommend if prep time is in the future
             if prep_time > target_date:
-                # Calculate how much to prep (cover next 4 hours)
+                # Calculate how much to prep (cover next 4 hours) - REDUCED TO 2 HOURS FOR SPEED
                 total_demand = 0
-                for hour in range(stockout_hour, min(stockout_hour + 4, 24)):
+                for hour in range(stockout_hour, min(stockout_hour + 2, 24)):  # Changed from 4 to 2
                     forecast = calculate_hourly_demand_forecast(
                         db, store_id, sku.id, hour, target_date.weekday()
                     )

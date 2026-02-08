@@ -47,13 +47,16 @@ async def get_overview(
         SKU, InventorySnapshot.sku_id == SKU.id
     ).filter(
         InventorySnapshot.ts_date == latest_date
+    ).order_by(
+        InventorySnapshot.store_id,  # Order by store first to distribute evenly
+        InventorySnapshot.sku_id
     )
     
     # Apply filters
     if store_id:
         query = query.filter(InventorySnapshot.store_id == store_id)
     
-    results = query.limit(limit * 2).all()  # Get more, filter by criteria
+    results = query.limit(limit * 10).all()  # Get 10x more records to ensure all stores represented
     
     items = []
     

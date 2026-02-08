@@ -145,15 +145,25 @@ def generate_demo_data(
         
         skus = []
         sku_count = 0
+        used_names = set()  # Track used names to avoid duplicates
+        
         for category, count in categories.items():
             base_names = sku_names.get(category, ["Product"])
             for i in range(count):
                 if sku_count >= num_skus:
                     break
                     
-                # Generate realistic Chipotle SKU names
+                # Generate UNIQUE Chipotle SKU names
                 base_name = random.choice(base_names)
+                
+                # Make name unique by adding variant number if needed
                 name = base_name
+                variant = 1
+                while name in used_names:
+                    variant += 1
+                    name = f"{base_name} #{variant}"
+                
+                used_names.add(name)
                 
                 # Realistic costs for restaurant ingredients
                 cost_ranges = {
