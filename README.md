@@ -1,4 +1,4 @@
-# NCR Voyix Inventory Health Dashboard
+# Optimus Inventory Health Dashboard
 
 > A hackathon prototype for Chipotle restaurants that predicts stockouts, detects inventory anomalies, and optimizes cross-store transfers to reduce waste and improve inventory accuracy.
 
@@ -25,7 +25,7 @@ docker-compose up --build
 ```
 
 **Demo Credentials:**
-- Username: `admin@ncr.com`
+- Username: `admin@optimus.com`
 - Password: `admin123`
 
 ---
@@ -550,7 +550,6 @@ Built for UGAHacks 11 by [Your Team Name]
 
 ##  Acknowledgments
 
-- NCR Voyix for the hackathon challenge
 - FastAPI and Next.js communities
 - UGAHacks organizers
 

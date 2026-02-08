@@ -1,4 +1,4 @@
-# Implementation Guide - NCR Voyix Inventory Health Dashboard
+# Implementation Guide - Optimus Inventory Health Dashboard
 
 ## Quick Start (For Judges)
 

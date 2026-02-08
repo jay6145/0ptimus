@@ -1,4 +1,4 @@
-# NCR Voyix Inventory Health Dashboard - Technical Architecture
+# Optimus Inventory Health Dashboard - Technical Architecture
 
 ## Executive Summary
 

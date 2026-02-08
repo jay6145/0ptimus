@@ -1,4 +1,4 @@
-# Project Summary - NCR Voyix Inventory Health Dashboard
+# Project Summary - Optimus Inventory Health Dashboard
 
 ## Overview
 

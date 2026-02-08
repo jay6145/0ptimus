@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased bg-ncr-gray-50">
-        {/* NCR Voyix Header with Purple Theme */}
+        {/* Optimus Header with Purple Theme */}
         <nav className="bg-white border-b border-ncr-gray-200 sticky top-0 z-50 shadow-sm">
           <div className="max-w-7xl mx-auto px-8">
             <div className="flex items-center justify-between h-16">
@@ -23,7 +23,7 @@ export default function RootLayout({
               <Link href="/" className="flex items-center">
                 <img 
                   src="/images/optimus.svg" 
-                  alt="NCR Voyix" 
+                  alt="Optimus Logo" 
                   className="h-6"
                 />
               </Link>

@@ -1,4 +1,4 @@
-# Project Status - NCR Voyix Inventory Health Dashboard
+# Project Status - Optimus Inventory Health Dashboard
 
 ## ✅ Completed
 

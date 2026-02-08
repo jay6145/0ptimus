@@ -1,4 +1,4 @@
-# NCR Voyix Inventory Health Dashboard — Complete Onboarding Guide
+# Optimus Inventory Health Dashboard — Complete Onboarding Guide
 
 **This document is written for new team members who know nothing about the project.**  
 Read it top to bottom to understand what we built, why, how it works, and how to run and contribute.
@@ -354,7 +354,7 @@ You usually don’t need to change these for local demo.
 
 ### App Router Structure
 
-- **layout.tsx**: Root layout; nav links (Overview, Transfers), logo (e.g. NCR Voyix), footer.  
+- **layout.tsx**: Root layout; nav links (Overview, Transfers), logo (e.g. Optimus), footer.  
 - **page.tsx**: Main **overview** page:
   - Alert cards (critical stockouts, low confidence, transfer opportunities).  
   - **IoT telemetry card** (cooler/freezer/ambient temp, humidity; Fahrenheit; OK/Warning/Critical).  

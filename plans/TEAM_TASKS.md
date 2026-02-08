@@ -1,4 +1,4 @@
-# Team Task List - NCR Voyix Inventory Health Dashboard
+# Team Task List - Optimus Inventory Health Dashboard
 
 ## 🎯 Project Overview
 

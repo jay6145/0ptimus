@@ -9,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // NCR Voyix Purple Brand
+        // Optimus Purple Brand
         ncr: {
           primary: '#5B3A9B',        // Main purple
           'primary-dark': '#4A2F7F',  // Darker purple

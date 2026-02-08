@@ -57,7 +57,7 @@ Use this checklist to see **everything we have done so far** and **everything we
 
 ### Frontend — structure and UI
 - [x] Next.js 14 App Router, TypeScript, Tailwind, Recharts
-- [x] Root layout with nav (Overview, Transfers), NCR Voyix logo, footer
+- [x] Root layout with nav (Overview, Transfers), Optimus logo, footer
 - [x] Overview page: alert cards, store/risk filters, sort, inventory table
 - [x] SKU detail page: forecast chart, anomalies, recommendations, hourly forecast toggle
 - [x] Transfers page: recommendations list, draft/approve flow
@@ -71,7 +71,7 @@ Use this checklist to see **everything we have done so far** and **everything we
 - [x] Unique SKU names in demo data (no duplicate “Tomatoes (Roma)”)
 - [x] React keys fixed for table rows (`store_id-sku_id`)
 - [x] Peak Hours button styling (font) matches other nav buttons
-- [x] NCR Voyix logo in navbar (from `public/images/ncr-voyix-og.svg`), size adjusted
+- [x] Optimus logo in navbar (from `public/images/ncr-voyix-og.svg`), size adjusted
 
 ### IoT / telemetry
 - [x] Telemetry model and table
@@ -123,7 +123,7 @@ Use this checklist to see **everything we have done so far** and **everything we
 ### Submission day — checklist
 - [ ] **Submit before deadline**: Link repo, video, description, team.
 - [ ] **Double-check links**: Repo URL, video URL, and “How to run” (Docker commands) work.
-- [ ] **Slack/Discord**: If the hackathon uses it, post repo + video in the channel and mention “NCR Voyix Inventory Health Dashboard”.
+- [ ] **Slack/Discord**: If the hackathon uses it, post repo + video in the channel and mention "Optimus Inventory Health Dashboard”.
 - [ ] **Team availability**: At least one person ready to answer questions or re-demo if judges reach out.
 
 ---

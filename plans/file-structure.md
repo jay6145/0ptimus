@@ -97,7 +97,7 @@ inventory-health-dashboard/
     ├── .eslintrc.json                  # ESLint config
     │
     ├── public/                         # Static assets
-    │   ├── logo.svg                    # NCR Voyix logo
+    │   ├── logo.svg                    # Optimus logo
     │   └── favicon.ico                 # Favicon
     │
     ├── src/

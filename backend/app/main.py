@@ -9,7 +9,7 @@ from .api import overview, sku, transfers, demo, peak_hours, telemetry
 
 # Create FastAPI app
 app = FastAPI(
-    title="NCR Voyix Inventory Health Dashboard API",
+    title="Optimus Inventory Health Dashboard API",
     description="Predictive inventory management with anomaly detection and transfer optimization",
     version="1.0.0",
     docs_url="/docs",
@@ -74,7 +74,7 @@ async def health_check():
 async def root():
     """Root endpoint"""
     return {
-        "message": "NCR Voyix Inventory Health Dashboard API",
+        "message": "Optimus Inventory Health Dashboard API",
         "docs": "/docs",
         "health": "/api/health",
         "endpoints": {
