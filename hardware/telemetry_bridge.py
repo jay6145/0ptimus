@@ -11,7 +11,7 @@ def post(api_url, store_id, sensor, value, unit=None):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--port", default="/dev/cu.usbmodem101")
+    ap.add_argument("--port", default="/dev/cu.usbmodem2101")
     # COM7 for Windows, /dev/cu.usbmodem101 for macOS, adjust as needed
     # pip3 install pyserial requests
     # python3 -m serial.tools.list_ports

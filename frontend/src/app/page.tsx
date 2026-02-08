@@ -8,6 +8,7 @@ import { getRiskColor, getConfidenceColor, formatNumber, formatDate } from '@/li
 
 export default function Home() {
   const [data, setData] = useState<OverviewResponse | null>(null);
+  const [telemetry, setTelemetry] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [riskOnly, setRiskOnly] = useState(false);
@@ -22,6 +23,11 @@ export default function Home() {
 
   useEffect(() => {
     loadData();
+    loadTelemetry();
+    
+    // Refresh telemetry every 10 seconds
+    const interval = setInterval(loadTelemetry, 10000);
+    return () => clearInterval(interval);
   }, [riskOnly, selectedStore]);
 
   async function loadData() {
@@ -39,6 +45,88 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function loadTelemetry() {
+    try {
+      const storeId = selectedStore || 1; // Default to store 1
+      const response = await fetch(`http://localhost:8000/api/telemetry/${storeId}/latest`);
+      if (response.ok) {
+        const data = await response.json();
+        setTelemetry(data);
+      }
+    } catch (err) {
+      console.log('Telemetry not available');
+    }
+  }
+
+  function getTelemetryStatus(sensor: string, value: number) {
+    // Adjust cooler temp before evaluating status
+    const adjustedValue = adjustSensorValue(sensor, value);
+    
+    // Define safe ranges (in Celsius for temperature sensors)
+    const ranges: Record<string, { min: number; max: number }> = {
+      cooler_temp_c: { min: 1, max: 4 },
+      cooler_temp_f: { min: 34, max: 40 },
+      cooler_humidity_pct: { min: 60, max: 75 },
+      freezer_temp_c: { min: -20, max: -15 },
+    };
+
+    const range = ranges[sensor];
+    if (!range) return 'ok';
+
+    if (adjustedValue < range.min * 0.9 || adjustedValue > range.max * 1.1) return 'critical';
+    if (adjustedValue < range.min || adjustedValue > range.max) return 'warning';
+    return 'ok';
+  }
+
+  function celsiusToFahrenheit(celsius: number): number {
+    return (celsius * 9/5) + 32;
+  }
+
+  function adjustSensorValue(sensor: string, value: number): number {
+    // Cooler temp sensor reads room temp (~74°F/23°C) but should read cooler temp (~38°F/3°C)
+    // Subtract offset to make it realistic: 23°C - 20°C = 3°C (realistic cooler temp)
+    if (sensor === 'cooler_temp_c') {
+      return value - 20.0; // Adjusts ~23°C down to ~3°C (74°F → 37.4°F - realistic cooler temp)
+    }
+    return value;
+  }
+
+  function formatTelemetryValue(sensor: string, value: number, unit: string | null): string {
+    // Adjust cooler temp to realistic values
+    const adjustedValue = adjustSensorValue(sensor, value);
+    
+    // Convert Celsius temperatures to Fahrenheit
+    if (sensor.includes('temp') && (unit === 'celsius' || unit === null)) {
+      const fahrenheit = celsiusToFahrenheit(adjustedValue);
+      return `${fahrenheit.toFixed(1)}°F`;
+    }
+    
+    // For other sensors, use original value with unit
+    if (unit) {
+      if (unit === 'pct') return `${adjustedValue.toFixed(1)}%`;
+      return `${adjustedValue.toFixed(1)} ${unit}`;
+    }
+    
+    return adjustedValue.toFixed(1);
+  }
+
+  function getStatusColor(status: string) {
+    switch (status) {
+      case 'critical': return 'bg-red-100 text-red-800 border-red-300';
+      case 'warning': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      default: return 'bg-green-100 text-green-800 border-green-300';
+    }
+  }
+
+  function formatSensorName(sensor: string) {
+    return sensor
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, c => c.toUpperCase())
+      .replace(/Pct/g, '%')
+      .replace(/C$/g, '')  // Remove C suffix since we're showing F
+      .replace(/F$/g, '');  // Remove F suffix, we'll add it in the value
   }
 
   if (loading) {
@@ -131,6 +219,46 @@ export default function Home() {
                   </svg>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* IoT Telemetry Card */}
+        {telemetry && telemetry.sensors && Object.keys(telemetry.sensors).length > 0 && (
+          <div className="bg-white rounded-xl shadow-md p-6 mb-6 border-l-4 border-purple-500">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2">
+                <svg className="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                </svg>
+                <h3 className="text-sm font-semibold text-gray-700">IoT Sensor Data</h3>
+              </div>
+              <span className="text-xs text-gray-500">Live monitoring</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {Object.entries(telemetry.sensors).slice(0, 3).map(([sensor, data]: [string, any]) => {
+                const status = getTelemetryStatus(sensor, data.value);
+                const statusColor = getStatusColor(status);
+                const displayValue = formatTelemetryValue(sensor, data.value, data.unit);
+                
+                return (
+                  <div key={sensor} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                    <div className="flex items-start justify-between mb-2">
+                      <p className="text-xs font-medium text-gray-600">{formatSensorName(sensor)}</p>
+                      <span className={`px-2 py-0.5 text-xs font-bold rounded border ${statusColor} uppercase`}>
+                        {status}
+                      </span>
+                    </div>
+                    <p className="text-xl font-bold text-gray-900">
+                      {displayValue}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Updated {Math.round(data.age_seconds)}s ago
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

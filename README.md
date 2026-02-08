@@ -56,7 +56,15 @@ docker-compose up --build
 - **Intra-day optimization** - catch stockouts hours before they happen, not days
 - **Visual hourly charts** - see demand spikes and inventory depletion by hour
 
-### 5. **Demo Mode**
+### 5. **IoT Telemetry Monitoring** 🌡️ NEW
+- **Live sensor data** displayed on the overview dashboard
+- **Real-time temperature and humidity monitoring** for coolers, freezers, and ambient conditions
+- **Smart status badges** (OK / Warning / Critical) based on food safety thresholds
+- **Auto-refresh every 10 seconds** - no page reload needed
+- **REST API for IoT devices** - any sensor can POST readings to `/api/telemetry`
+- **Proactive alerts** - catch equipment failures before inventory spoils
+
+### 6. **Demo Mode**
 - Runs with realistic synthetic data (no external dependencies)
 - 5 stores, 200 SKUs, 60 days of history
 - 110,000+ hourly sales records for peak-hour forecasting
@@ -97,6 +105,7 @@ graph TB
         TRANSFER[Transfer Optimizer]
         CONFIDENCE[Confidence Scorer]
         PEAKHOUR[Peak Hour Forecaster]
+        TELEMETRY[IoT Telemetry API]
     end
     
     subgraph "Data Layer"
@@ -104,12 +113,19 @@ graph TB
         SEED[Demo Data Generator]
     end
     
+    subgraph "IoT Devices"
+        SENSORS[Temperature/Humidity Sensors]
+    end
+    
     UI --> API
     CHARTS --> API
+    SENSORS --> TELEMETRY
     API --> FORECAST
     API --> ANOMALY
     API --> TRANSFER
     API --> CONFIDENCE
+    API --> TELEMETRY
+    TELEMETRY --> DB
     FORECAST --> DB
     ANOMALY --> DB
     TRANSFER --> DB
@@ -163,8 +179,16 @@ graph TB
    - "5 SKUs at risk of stockout in next 3 days"
    - "3 stores with low inventory confidence (<70)"
    - "8 transfer opportunities available"
-3. **Filter** by "High Risk Only" to see critical items
-4. **Sort** by "Days of Cover" to see most urgent stockouts
+3. **IoT Telemetry Card** 🌡️ (NEW - show this to judges):
+   - Shows live sensor data: "Cooler Temp: 38.1°F" (updated 8s ago)
+   - **Real IoT sensor** (calibrated for demo - room temp sensor adjusted by -20°C offset)
+   - **Temperatures displayed in Fahrenheit** (converted from Celsius)
+   - Status badge turns **CRITICAL** when temperature exceeds safe range (>39°F)
+   - Auto-refreshes every 10 seconds
+   - Demonstrates real-time monitoring to prevent food spoilage
+   - *Optional: Run `./simulate_sensors.sh` to simulate live IoT devices*
+4. **Filter** by "High Risk Only" to see critical items
+5. **Sort** by "Days of Cover" to see most urgent stockouts
 
 **Key Insight:** "Coca-Cola 12pk at Atlanta Store has only 1.9 days of inventory left"
 

@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from ..models import (
     Store, SKU, InventorySnapshot, SalesDaily, ReceiptsDaily,
     Transfer, CycleCount, Supplier, SKUSupplier, AnomalyEvent,
-    TransferRecommendation, StoreDistance, SalesHourly
+    TransferRecommendation, StoreDistance, SalesHourly, Telemetry
 )
 from ..database import SessionLocal, engine, Base
 import math
@@ -52,6 +52,8 @@ def generate_demo_data(
         db.query(Transfer).delete()
         db.query(ReceiptsDaily).delete()
         db.query(SalesDaily).delete()
+        db.query(SalesHourly).delete()
+        db.query(Telemetry).delete()
         db.query(InventorySnapshot).delete()
         db.query(SKUSupplier).delete()
         db.query(Supplier).delete()
@@ -488,6 +490,52 @@ def generate_demo_data(
         db.commit()
         print("✅ Hourly sales data generated")
         
+        # 10. Generate IoT Telemetry Data
+        print("📡 Generating IoT telemetry data...")
+        
+        # Sensor types with their normal ranges
+        sensor_configs = {
+            'cooler_temp_c': {'min': 2, 'max': 4, 'unit': 'celsius', 'variance': 0.5},
+            'cooler_humidity_pct': {'min': 65, 'max': 70, 'unit': 'pct', 'variance': 2},
+            'freezer_temp_c': {'min': -18, 'max': -16, 'unit': 'celsius', 'variance': 0.8},
+            'ambient_temp_c': {'min': 20, 'max': 24, 'unit': 'celsius', 'variance': 1.5},
+        }
+        
+        # Generate recent telemetry for all stores
+        now = datetime.utcnow()
+        
+        for store in stores:
+            for sensor, config in sensor_configs.items():
+                # Create readings for the last hour, every 5 minutes
+                for minutes_ago in range(60, 0, -5):
+                    ts = now - timedelta(minutes=minutes_ago)
+                    
+                    # Calculate base value within normal range
+                    base_value = random.uniform(config['min'], config['max'])
+                    
+                    # Add some variance
+                    value = base_value + random.uniform(-config['variance'], config['variance'])
+                    
+                    # Occasionally add anomalies (5% chance)
+                    if random.random() < 0.05:
+                        # Temperature drift or humidity spike
+                        if 'temp' in sensor:
+                            value += random.choice([-3, 3])  # Temperature drift
+                        else:
+                            value += random.uniform(5, 10)  # Humidity spike
+                    
+                    telemetry = Telemetry(
+                        store_id=store.id,
+                        sensor=sensor,
+                        value=round(value, 2),
+                        unit=config['unit'],
+                        ts_datetime=ts
+                    )
+                    db.add(telemetry)
+        
+        db.commit()
+        print("✅ IoT telemetry data generated")
+        
         # Summary
         stats = {
             "stores": len(stores),
@@ -497,6 +545,7 @@ def generate_demo_data(
             "total_sales": db.query(SalesDaily).count(),
             "total_sales_hourly": db.query(SalesHourly).count(),
             "total_receipts": db.query(ReceiptsDaily).count(),
+            "total_telemetry": db.query(Telemetry).count(),
             "anomalies": db.query(AnomalyEvent).count(),
             "cycle_counts": db.query(CycleCount).count(),
             "transfer_recommendations": db.query(TransferRecommendation).count()
