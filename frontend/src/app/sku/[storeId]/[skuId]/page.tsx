@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
-import type { SKUDetail } from '@/lib/types';
+import type { SKUDetail, HourlyForecast } from '@/lib/types';
 import { formatNumber, formatDate, getConfidenceColor } from '@/lib/utils';
 
 export default function SKUDetailPage() {
@@ -13,8 +13,11 @@ export default function SKUDetailPage() {
   const skuId = parseInt(params.skuId as string);
 
   const [data, setData] = useState<SKUDetail | null>(null);
+  const [hourlyData, setHourlyData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [hourlyLoading, setHourlyLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showHourly, setShowHourly] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -30,6 +33,24 @@ export default function SKUDetailPage() {
       setError(err instanceof Error ? err.message : 'Failed to load data');
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadHourlyForecast() {
+    if (hourlyData) {
+      setShowHourly(!showHourly);
+      return;
+    }
+
+    try {
+      setHourlyLoading(true);
+      const response = await api.getSKUHourlyForecast(storeId, skuId);
+      setHourlyData(response);
+      setShowHourly(true);
+    } catch (err) {
+      console.error('Failed to load hourly forecast:', err);
+    } finally {
+      setHourlyLoading(false);
     }
   }
 
@@ -137,7 +158,118 @@ export default function SKUDetailPage() {
               </p>
             </div>
           )}
+
+          {/* Hourly Forecast Toggle */}
+          <div className="mt-6 pt-4 border-t">
+            <button
+              onClick={loadHourlyForecast}
+              disabled={hourlyLoading}
+              className="px-4 py-2 bg-primary-500 text-white rounded hover:bg-primary-600 disabled:bg-gray-400 text-sm font-medium"
+            >
+              {hourlyLoading ? 'Loading...' : showHourly ? 'Hide Hourly Forecast' : '⏰ View Hourly Forecast (Peak Hours)'}
+            </button>
+          </div>
         </div>
+
+        {/* Hourly Forecast Section */}
+        {showHourly && hourlyData && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">Hourly Demand Forecast</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Predicted demand by hour - Peak hours (lunch 11am-2pm, dinner 5pm-8pm) highlighted in orange
+            </p>
+
+            {/* Current Inventory Status */}
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-blue-700 mb-1">Current On Hand</p>
+                  <p className="text-2xl font-bold text-blue-900">{hourlyData.current_on_hand} units</p>
+                </div>
+                {hourlyData.stockout_prediction.will_stockout && (
+                  <div>
+                    <p className="text-sm text-red-700 mb-1">Predicted Stockout</p>
+                    <p className="text-lg font-bold text-red-900">
+                      {new Date(hourlyData.stockout_prediction.stockout_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
+                    </p>
+                    {hourlyData.stockout_prediction.is_during_peak && (
+                      <span className="text-xs font-semibold text-red-600">
+                        ⚠️ DURING {hourlyData.stockout_prediction.peak_period?.toUpperCase()} RUSH
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Hourly Bar Chart */}
+            <div className="space-y-2">
+              {hourlyData.hourly_forecast.map((forecast: any, idx: number) => {
+                const maxDemand = Math.max(...hourlyData.hourly_forecast.map((f: any) => f.predicted_demand || 0), 1);
+                const widthPercent = ((forecast.predicted_demand || 0) / maxDemand) * 100;
+                const willStockout = forecast.will_stockout_this_hour;
+
+                return (
+                  <div key={idx} className="flex items-center space-x-3">
+                    <div className="w-16 text-sm font-medium text-gray-700">
+                      {forecast.hour_display}
+                    </div>
+                    <div className="flex-1">
+                      <div className="relative h-8 bg-gray-100 rounded overflow-hidden">
+                        <div
+                          className={`h-full transition-all ${
+                            willStockout
+                              ? 'bg-red-500'
+                              : forecast.is_peak_hour
+                              ? 'bg-orange-500'
+                              : 'bg-blue-400'
+                          }`}
+                          style={{ width: `${widthPercent}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                    <div className="w-24 text-right">
+                      <span className="text-sm font-semibold text-gray-900">
+                        {formatNumber(forecast.predicted_demand, 1)} units
+                      </span>
+                      {forecast.remaining_inventory !== undefined && (
+                        <div className="text-xs text-gray-500">
+                          ({formatNumber(forecast.remaining_inventory, 0)} left)
+                        </div>
+                      )}
+                    </div>
+                    {willStockout && (
+                      <div className="text-xs font-bold text-red-600">
+                        STOCKOUT
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Legend */}
+            <div className="mt-6 flex items-center justify-center space-x-6 text-sm">
+              <div className="flex items-center">
+                <div className="w-4 h-4 bg-blue-400 rounded mr-2"></div>
+                <span className="text-gray-700">Regular Hours</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-4 h-4 bg-orange-500 rounded mr-2"></div>
+                <span className="text-gray-700">Peak Hours</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-4 h-4 bg-red-500 rounded mr-2"></div>
+                <span className="text-gray-700">Stockout</span>
+              </div>
+            </div>
+
+            {/* Peak Hours Info */}
+            <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded text-xs text-gray-600">
+              <span className="font-semibold">Peak Hours:</span> Lunch (11am-2pm) and Dinner (5pm-8pm)
+            </div>
+          </div>
+        )}
 
         {/* Anomalies */}
         {data.anomalies && data.anomalies.length > 0 && (

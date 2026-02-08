@@ -11,16 +11,25 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [riskOnly, setRiskOnly] = useState(false);
+  const [selectedStore, setSelectedStore] = useState<number | null>(null);
+  const [stores, setStores] = useState<Array<{id: number, name: string}>>([
+    { id: 1, name: 'Chipotle Athens Downtown' },
+    { id: 2, name: 'Chipotle Athens Eastside' },
+    { id: 3, name: 'Chipotle Athens West' },
+    { id: 4, name: 'Chipotle Athens North' },
+    { id: 5, name: 'Chipotle Athens South' },
+  ]);
 
   useEffect(() => {
     loadData();
-  }, [riskOnly]);
+  }, [riskOnly, selectedStore]);
 
   async function loadData() {
     try {
       setLoading(true);
       const response = await api.getOverview({
         risk_only: riskOnly,
+        store_id: selectedStore || undefined,
         limit: 50
       });
       setData(response);
@@ -128,8 +137,24 @@ export default function Home() {
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <div className="flex items-center space-x-4 flex-wrap gap-2">
+              {/* Store Filter */}
+              <div className="flex items-center space-x-2">
+                <label className="text-sm font-medium text-gray-700">Store:</label>
+                <select
+                  value={selectedStore || ''}
+                  onChange={(e) => setSelectedStore(e.target.value ? parseInt(e.target.value) : null)}
+                  className="rounded border-gray-300 text-sm py-1 px-2 border focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="">All Stores</option>
+                  {stores.map(store => (
+                    <option key={store.id} value={store.id}>{store.name}</option>
+                  ))}
+                </select>
+              </div>
+              
+              {/* Risk Filter */}
               <label className="flex items-center">
                 <input
                   type="checkbox"
@@ -140,6 +165,7 @@ export default function Home() {
                 <span className="ml-2 text-sm text-gray-700">Show high-risk items only</span>
               </label>
             </div>
+            
             <div className="flex space-x-2">
               <Link
                 href="/peak-hours"
@@ -160,6 +186,13 @@ export default function Home() {
                 Admin
               </Link>
             </div>
+          </div>
+          
+          {/* Info Note */}
+          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
+            <span className="font-semibold">💡 Multi-Store View:</span> Each row represents inventory at a specific store. 
+            The same ingredient may appear multiple times because each store has different stock levels, demand, and risk. 
+            Use the store filter above to view a single location.
           </div>
         </div>
 
@@ -182,12 +215,15 @@ export default function Home() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {data?.items.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.store_name}</td>
+                  <tr key={`${item.store_id}-${item.sku_id}`} className="hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">{item.store_name}</div>
+                      <div className="text-xs text-gray-500">Store ID: {item.store_id}</div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <Link
                         href={`/sku/${item.store_id}/${item.sku_id}`}
-                        className="text-sm text-blue-600 hover:underline"
+                        className="text-sm font-medium text-blue-600 hover:underline"
                       >
                         {item.sku_name}
                       </Link>

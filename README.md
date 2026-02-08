@@ -49,9 +49,17 @@ docker-compose up --build
 - Prevents stockouts faster and cheaper than new orders
 - Clear rationale for every recommendation
 
-### 4. **Demo Mode**
+### 4. **Peak Hour Forecasting** ⭐ NEW
+- **Hourly demand prediction** for lunch (11am-2pm) and dinner (5pm-8pm) rushes
+- **Prep schedule generation** - tells staff exactly when and how much to prep
+- **Real-time stockout alerts** - "Chicken will run out at 12:45pm during lunch rush"
+- **Intra-day optimization** - catch stockouts hours before they happen, not days
+- **Visual hourly charts** - see demand spikes and inventory depletion by hour
+
+### 5. **Demo Mode**
 - Runs with realistic synthetic data (no external dependencies)
 - 5 stores, 200 SKUs, 60 days of history
+- 110,000+ hourly sales records for peak-hour forecasting
 - Pre-injected anomalies and transfer opportunities
 - One-click data regeneration
 
@@ -88,6 +96,7 @@ graph TB
         ANOMALY[Anomaly Detector]
         TRANSFER[Transfer Optimizer]
         CONFIDENCE[Confidence Scorer]
+        PEAKHOUR[Peak Hour Forecaster]
     end
     
     subgraph "Data Layer"
@@ -126,6 +135,28 @@ graph TB
 
 ## 🎬 Demo Script (For Judges)
 
+### Step 0: Peak Hours Dashboard (NEW - SHOW THIS FIRST!) ⭐
+1. Navigate to `http://localhost:3000/peak-hours` (or click "⏰ Peak Hours" button)
+2. **Current Time & Next Peak** shows:
+   - Current time with countdown to next rush period
+   - "Next peak: Lunch rush in 2h 15m" (or "LUNCH RUSH IN PROGRESS")
+3. **Critical Alerts** banner:
+   - "⚠️ 2 Items Will Stock Out During Peak Hours"
+   - Shows which items and exact stockout times during rush
+4. **Today's Prep Schedule**:
+   - "Prep 40 units Chicken by 10:30 AM" (CRITICAL - for lunch rush)
+   - "Prep 15 units Guacamole by 4:45 PM" (HIGH - for dinner rush)
+   - Each task shows quantity, timing, and urgency
+5. **Hourly Forecast Charts**:
+   - Visual bar charts showing demand by hour
+   - Orange bars = peak hours (11am-2pm, 5pm-8pm)
+   - Red bars = predicted stockout during that hour
+   - Regular blue = normal demand
+
+**Key Insight:** "System predicts chicken will run out at 12:45 PM during lunch rush - gives 2+ hours advance warning to prep!"
+
+---
+
 ### Step 1: Overview Dashboard
 1. Navigate to `http://localhost:3000`
 2. **Top Alerts Bar** shows:
@@ -145,10 +176,15 @@ graph TB
    - Declining on-hand inventory
    - Higher sales on weekends (pattern detection)
    - Predicted stockout date: Feb 9, 2026
-3. **Anomaly Timeline** shows:
+3. **Click "⏰ View Hourly Forecast (Peak Hours)"** button:
+   - Shows hourly demand breakdown
+   - Highlights peak hours in orange
+   - Shows exact hour of stockout (e.g., "Will run out at 1:00 PM")
+   - Red bars indicate when inventory hits zero
+4. **Anomaly Timeline** shows:
    - Flagged event 3 days ago
    - **Explanation**: "Expected +20 units after receiving shipment, but inventory only increased by 12 units. Possible receiving error or damage."
-4. **Recommendation Cards**:
+5. **Recommendation Cards**:
    - **Transfer**: "Transfer 25 units from Boston Store (prevents stockout, saves $455)"
    - **Reorder**: "If transfer not feasible, order 84 units from supplier (3-day lead time)"
    - **Cycle Count**: "Schedule physical count (last count: 18 days ago)"
