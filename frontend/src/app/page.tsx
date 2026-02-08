@@ -122,7 +122,7 @@ export default function Home() {
             <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-ncr-primary hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-ncr-primary font-semibold uppercase tracking-wide">Transfer Opportunities</p>
+                  <p className="text-sm text-ncr-primary font-medium">Transfer Opportunities</p>
                   <p className="text-2xl font-bold text-ncr-primary">{data.alerts.transfer_opportunities}</p>
                 </div>
                 <div className="text-ncr-primary">
@@ -169,9 +169,9 @@ export default function Home() {
             <div className="flex space-x-2">
               <Link
                 href="/peak-hours"
-                className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 text-sm font-medium shadow-sm"
+                className="px-6 py-3 bg-gradient-purple text-white rounded-lg hover:bg-gradient-purple-dark transition-all font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               >
-                ⏰ Peak Hours
+                Peak Hours
               </Link>
               <Link
                 href="/transfers"
@@ -181,7 +181,7 @@ export default function Home() {
               </Link>
               <Link
                 href="/admin"
-                className="px-6 py-3 bg-ncr-gray-700 text-white rounded-lg hover:bg-ncr-gray-800 transition-colors font-bold shadow-md"
+                className="px-6 py-3 bg-ncr-gray-700 text-white rounded-lg hover:bg-ncr-gray-800 transition-colors font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
               >
                 Admin
               </Link>
