@@ -64,7 +64,7 @@ export default function TransfersPage() {
       <main className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ncr-primary mx-auto"></div>
             <p className="mt-4 text-gray-600">Loading transfer recommendations...</p>
           </div>
         </div>
@@ -74,7 +74,7 @@ export default function TransfersPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-gray-50 p-8">
+      <main className="min-h-screen bg-ncr-gray-50 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
             <h2 className="text-red-800 font-semibold mb-2">Error Loading Data</h2>
@@ -92,20 +92,20 @@ export default function TransfersPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-ncr-gray-50">
       {/* Header */}
-      <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-8 py-6">
+      <div className="bg-gradient-purple text-white">
+        <div className="max-w-7xl mx-auto px-8 py-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Transfer Recommendations</h1>
-              <p className="text-gray-600 mt-1">
+              <h1 className="text-4xl font-bold mb-2">Transfer Recommendations</h1>
+              <p className="text-purple-100 text-lg">
                 Optimize inventory by transferring between stores
               </p>
             </div>
             <Link
               href="/"
-              className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+              className="px-6 py-3 bg-white text-ncr-primary rounded-lg hover:bg-ncr-gray-100 transition-colors font-semibold shadow-lg"
             >
               ← Back to Overview
             </Link>
@@ -117,21 +117,21 @@ export default function TransfersPage() {
         {/* Summary Cards */}
         {data && data.summary && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white border rounded-lg p-4">
-              <p className="text-sm text-gray-600">Total Opportunities</p>
-              <p className="text-2xl font-bold text-gray-900">{data.summary.total_opportunities}</p>
+            <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-ncr-primary hover:shadow-lg transition-shadow">
+              <p className="text-sm text-ncr-primary font-semibold uppercase tracking-wide mb-2">Total Opportunities</p>
+              <p className="text-4xl font-bold text-ncr-primary">{data.summary.total_opportunities}</p>
             </div>
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <p className="text-sm text-red-600">High Urgency</p>
-              <p className="text-2xl font-bold text-red-700">{data.summary.high_urgency}</p>
+            <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-red-500 hover:shadow-lg transition-shadow">
+               <p className="text-sm text-red-600 font-semibold uppercase tracking-wide mb-2">High Urgency</p>
+               <p className="text-4xl font-bold text-red-600">{data.summary.high_urgency}</p>
             </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-sm text-blue-600">Total Units</p>
-              <p className="text-2xl font-bold text-blue-700">{data.summary.total_units}</p>
+            <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-ncr-secondary hover:shadow-lg transition-shadow">
+               <p className="text-sm text-ncr-secondary font-semibold uppercase tracking-wide mb-2">Total Units</p>
+               <p className="text-4xl font-bold text-ncr-secondary">{data.summary.total_units}</p>
             </div>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <p className="text-sm text-green-600">Est. Savings</p>
-              <p className="text-2xl font-bold text-green-700">{formatCurrency(data.summary.estimated_savings)}</p>
+            <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-green-500 hover:shadow-lg transition-shadow">
+               <p className="text-sm text-green-600 font-semibold uppercase tracking-wide mb-2">Est. Savings</p>
+               <p className="text-4xl font-bold text-green-600">{formatCurrency(data.summary.estimated_savings)}</p>
             </div>
           </div>
         )}
@@ -175,7 +175,7 @@ export default function TransfersPage() {
                   <button
                     onClick={() => createTransfer(rec, idx)}
                     disabled={creating === idx}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="px-6 py-3 bg-gradient-purple text-white rounded-lg hover:bg-gradient-purple-dark disabled:bg-ncr-gray-400 disabled:cursor-not-allowed transition-all font-bold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
                   >
                     {creating === idx ? 'Creating...' : 'Create Transfer'}
                   </button>
