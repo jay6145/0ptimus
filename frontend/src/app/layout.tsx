@@ -20,19 +20,12 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-8">
             <div className="flex items-center justify-between h-16">
               {/* Logo */}
-              <Link href="/" className="flex items-center space-x-2">
-                <span className="text-2xl font-bold text-ncr-dark tracking-tight">
-                  NCR V
-                  <span className="inline-flex items-center">
-                    <span className="relative">
-                      <span className="text-ncr-primary">O</span>
-                      <span className="absolute inset-0 flex items-center justify-center">
-                        <span className="w-1.5 h-1.5 bg-ncr-primary rounded-full"></span>
-                      </span>
-                    </span>
-                  </span>
-                  YIX
-                </span>
+              <Link href="/" className="flex items-center">
+                <img 
+                  src="/images/ncr-voyix-og.svg" 
+                  alt="NCR Voyix" 
+                  className="h-6"
+                />
               </Link>
 
               {/* Navigation */}
@@ -51,7 +44,7 @@ export default function RootLayout({
         <footer className="bg-white border-t border-ncr-gray-200 mt-12">
           <div className="max-w-7xl mx-auto px-8 py-6">
             <div className="flex items-center justify-between text-sm text-ncr-gray-600">
-              <p>© 2025 NCR Voyix Corporation</p>
+              <p>© 2026 NCR Voyix Corporation</p>
               <p className="text-ncr-primary font-semibold">UGAHacks 11</p>
             </div>
           </div>
