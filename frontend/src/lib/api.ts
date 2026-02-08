@@ -8,6 +8,7 @@ import type {
   TransferRecommendationsResponse,
   Transfer,
   DemoStats,
+  DemoPreview,
   PeakHoursDashboard
 } from './types';
 
@@ -105,6 +106,19 @@ export const api = {
   // Demo data endpoints
   async getDemoStats(): Promise<DemoStats> {
     return fetchAPI<DemoStats>('/api/demo/stats');
+  },
+
+  async getDemoPreview(params?: {
+    num_stores?: number;
+    num_skus?: number;
+    days_history?: number;
+  }): Promise<DemoPreview> {
+    const q = new URLSearchParams();
+    if (params?.num_stores != null) q.append('num_stores', String(params.num_stores));
+    if (params?.num_skus != null) q.append('num_skus', String(params.num_skus));
+    if (params?.days_history != null) q.append('days_history', String(params.days_history));
+    const query = q.toString();
+    return fetchAPI<DemoPreview>(`/api/demo/preview${query ? `?${query}` : ''}`);
   },
 
   async regenerateDemoData(params?: {

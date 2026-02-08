@@ -80,38 +80,6 @@ export default function TransfersPage() {
     return d.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ncr-primary mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading transfer recommendations...</p>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  if (error) {
-    return (
-      <main className="min-h-screen bg-ncr-gray-50 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <h2 className="text-red-800 font-semibold mb-2">Error Loading Data</h2>
-            <p className="text-red-600">{error}</p>
-            <button
-              onClick={loadData}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="min-h-screen bg-ncr-gray-50">
       {/* Header */}
@@ -135,8 +103,32 @@ export default function TransfersPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-8 py-6">
+        {/* Error banner - inline so layout always visible */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-red-800 font-semibold mb-1">Error loading data</h2>
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+            <button
+              onClick={loadData}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium text-sm"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Loading - only content area, header already visible */}
+        {loading && !data ? (
+          <div className="bg-white rounded-xl shadow-md p-12 flex flex-col items-center justify-center gap-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-ncr-primary border-t-transparent"></div>
+            <p className="text-gray-600">Loading transfer recommendations...</p>
+          </div>
+        ) : (
+          <>
         {/* Summary Cards */}
-        {data && data.summary && (
+        {data?.summary && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
             <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-ncr-primary hover:shadow-lg transition-shadow">
               <p className="text-sm text-ncr-primary font-semibold uppercase tracking-wide mb-2">Total Opportunities</p>
@@ -159,7 +151,7 @@ export default function TransfersPage() {
 
         {/* Recommendations List */}
         <div className="space-y-4">
-          {data?.recommendations.map((rec, idx) => (
+          {(data?.recommendations ?? []).map((rec, idx) => (
             <div key={idx} className="bg-white rounded-lg shadow-md overflow-hidden">
               <div className="p-6">
                 <div className="flex items-start justify-between mb-4">
@@ -290,6 +282,8 @@ export default function TransfersPage() {
             </div>
           )}
         </div>
+          </>
+        )}
       </div>
     </main>
   );

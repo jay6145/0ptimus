@@ -10,6 +10,7 @@ export default function Home() {
   const [data, setData] = useState<OverviewResponse | null>(null);
   const [telemetry, setTelemetry] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [tableLoading, setTableLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [riskOnly, setRiskOnly] = useState(false);
   const [selectedStore, setSelectedStore] = useState<number | null>(null);
@@ -31,8 +32,13 @@ export default function Home() {
   }, [riskOnly, selectedStore]);
 
   async function loadData() {
+    const isInitialLoad = data === null;
     try {
-      setLoading(true);
+      if (isInitialLoad) {
+        setLoading(true);
+      } else {
+        setTableLoading(true);
+      }
       const response = await api.getOverview({
         risk_only: riskOnly,
         store_id: selectedStore || undefined,
@@ -44,6 +50,7 @@ export default function Home() {
       setError(err instanceof Error ? err.message : 'Failed to load data');
     } finally {
       setLoading(false);
+      setTableLoading(false);
     }
   }
 
@@ -129,38 +136,6 @@ export default function Home() {
       .replace(/F$/g, '');  // Remove F suffix, we'll add it in the value
   }
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-ncr-gray-50 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-12">
-           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ncr-primary mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading inventory data...</p>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  if (error) {
-    return (
-      <main className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-            <h2 className="text-red-800 font-semibold mb-2">Error Loading Data</h2>
-            <p className="text-red-600">{error}</p>
-            <button
-              onClick={loadData}
-              className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-            >
-              Retry
-            </button>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
   return (
     <main className="min-h-screen bg-ncr-gray-50">
       {/* Hero - Hackathon-ready */}
@@ -184,10 +159,24 @@ export default function Home() {
       </div>
 
       <div className="max-w-7xl mx-auto px-8 py-6">
-        {/* Quick demo hint for judges */}
-        {/* Alerts Bar */}
-        {data && data.alerts && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        {/* Error banner - inline so layout always visible */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-red-800 font-semibold mb-1">Error loading data</h2>
+              <p className="text-red-600 text-sm">{error}</p>
+            </div>
+            <button
+              onClick={loadData}
+              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 font-medium text-sm"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Alerts Bar - always show layout; use — when loading */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
            <button
               type="button"
               onClick={() => setRiskOnly(true)}
@@ -196,7 +185,7 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-red-600 font-medium">Critical Stockouts</p>
-                  <p className="text-2xl font-bold text-red-700">{data.alerts.critical_stockouts}</p>
+                  <p className="text-2xl font-bold text-red-700">{data?.alerts?.critical_stockouts ?? '—'}</p>
                   <p className="text-xs text-gray-500 mt-1">Click to filter</p>
                 </div>
                 <div className="text-red-400">
@@ -211,7 +200,7 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-yellow-600 font-medium">Low Confidence</p>
-                  <p className="text-2xl font-bold text-yellow-700">{data.alerts.low_confidence}</p>
+                  <p className="text-2xl font-bold text-yellow-700">{data?.alerts?.low_confidence ?? '—'}</p>
                 </div>
                 <div className="text-yellow-400">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
@@ -228,7 +217,7 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-ncr-primary font-medium">Transfer Opportunities</p>
-                  <p className="text-2xl font-bold text-ncr-primary">{data.alerts.transfer_opportunities}</p>
+                  <p className="text-2xl font-bold text-ncr-primary">{data?.alerts?.transfer_opportunities ?? '—'}</p>
                   <p className="text-xs text-gray-500 mt-1">View transfers →</p>
                 </div>
                 <div className="text-ncr-primary">
@@ -239,7 +228,6 @@ export default function Home() {
               </div>
             </Link>
           </div>
-        )}
 
         {/* IoT Telemetry Card */}
         {telemetry && telemetry.sensors && Object.keys(telemetry.sensors).length > 0 && (
@@ -346,7 +334,15 @@ export default function Home() {
         </div>
 
         {/* Inventory Table */}
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden relative">
+          {(loading || tableLoading) && (
+            <div className="absolute inset-0 bg-white/80 z-10 flex items-center justify-center rounded-xl">
+              <div className="flex flex-col items-center gap-2">
+                <div className="animate-spin rounded-full h-10 w-10 border-2 border-ncr-primary border-t-transparent"></div>
+                <p className="text-sm text-gray-600">Updating...</p>
+              </div>
+            </div>
+          )}
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
             <h2 className="text-lg font-bold text-ncr-dark">Inventory by Store</h2>
             <p className="text-sm text-gray-600 mt-0.5">Click an ingredient for forecast, anomalies, and hourly demand</p>
@@ -367,7 +363,7 @@ export default function Home() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {data?.items.map((item, idx) => (
+                {(data?.items ?? []).map((item, idx) => (
                   <tr key={`${item.store_id}-${item.sku_id}`} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">{item.store_name}</div>

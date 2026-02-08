@@ -3,16 +3,20 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
-import type { DemoStats } from '@/lib/types';
+import type { DemoStats, DemoPreview } from '@/lib/types';
+
+const DEMO_PARAMS = { num_stores: 5, num_skus: 200, days_history: 60 };
 
 export default function AdminPage() {
   const [stats, setStats] = useState<DemoStats | null>(null);
+  const [preview, setPreview] = useState<DemoPreview | null>(null);
   const [loading, setLoading] = useState(true);
   const [regenerating, setRegenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadStats();
+    loadPreview();
   }, []);
 
   async function loadStats() {
@@ -28,6 +32,15 @@ export default function AdminPage() {
     }
   }
 
+  async function loadPreview() {
+    try {
+      const data = await api.getDemoPreview(DEMO_PARAMS);
+      setPreview(data);
+    } catch {
+      setPreview(null);
+    }
+  }
+
   async function regenerateData() {
     if (!confirm('This will delete all existing data and generate new demo data. Continue?')) {
       return;
@@ -35,11 +48,7 @@ export default function AdminPage() {
 
     try {
       setRegenerating(true);
-      await api.regenerateDemoData({
-        num_stores: 5,
-        num_skus: 200,
-        days_history: 60
-      });
+      await api.regenerateDemoData(DEMO_PARAMS);
       alert('Demo data regenerated successfully!');
       await loadStats();
     } catch (err) {
@@ -93,7 +102,7 @@ export default function AdminPage() {
 
         {/* Database Statistics */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-6">
-          <h2 className="text-2xl font-semibold text-ncr-dark- mb-6">Database Statistics</h2>
+          <h2 className="text-2xl font-semibold text-ncr-dark mb-6">Database Statistics</h2>
           
           {stats && (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -159,16 +168,50 @@ export default function AdminPage() {
 
           <div className="space-y-4">
             <div>
-              <h3 className="text-sm font-medium text-gray-700 mb-2">What will be generated:</h3>
-              <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                <li>5 stores with realistic locations (Atlanta, Boston, Chicago, Denver, Seattle)</li>
-                <li>200 SKUs across 8 categories (Beverages, Snacks, Dairy, Produce, etc.)</li>
-                <li>60 days of sales history with weekday/weekend patterns</li>
-                <li>15-20 injected anomalies (shrink events, receiving errors, systematic patterns)</li>
-                <li>5-8 transfer opportunities</li>
-                <li>Cycle counts for ~20% of SKUs</li>
-                <li>Store distance matrix for transfer optimization</li>
-              </ul>
+              <h3 className="text-sm font-medium text-gray-700 mb-2">What will be generated (based on current demo data settings):</h3>
+              {preview ? (
+                <ul className="list-disc list-inside text-sm text-gray-600 space-y-1.5">
+                  <li>
+                    <strong>{preview.stores} stores</strong> — {preview.store_names.join(', ')}
+                  </li>
+                  <li>
+                    <strong>{preview.skus} SKUs</strong> across {preview.categories.length} categories: {preview.categories.join(', ')}
+                  </li>
+                  <li>
+                    <strong>{preview.days_history} days</strong> of sales history with weekday/weekend patterns
+                  </li>
+                  <li>
+                    <strong>~{preview.inventory_snapshots_approx.toLocaleString()} inventory snapshots</strong> (stores × SKUs × days)
+                  </li>
+                  <li>
+                    Receipts: <strong>{preview.receipt_chance_pct}%</strong> chance per day per store-SKU
+                  </li>
+                  <li>
+                    <strong>~{preview.anomalies_approx} anomalies</strong> (injected shrink / unrecorded drops)
+                  </li>
+                  <li>
+                    Cycle counts: <strong>{preview.cycle_recent_pct}%</strong> of SKUs recent (last 7 days), <strong>{preview.cycle_older_pct}%</strong> older, <strong>{preview.cycle_none_pct}%</strong> none (per store)
+                  </li>
+                  <li>
+                    Transfer recommendations: <strong>{preview.transfer_recommendations_approx}</strong>
+                  </li>
+                  <li>
+                    Hourly sales: last <strong>{preview.sales_hourly_days} days</strong>, categories {preview.sales_hourly_categories.join(', ')}, up to {preview.sales_hourly_skus_per_store} SKUs per store (for Peak Hours)
+                  </li>
+                  <li>
+                    IoT telemetry: <strong>{preview.telemetry_sensors} sensors</strong> × all stores — {preview.telemetry_description}
+                  </li>
+                  <li>Store distance matrix for transfer optimization (all store pairs)</li>
+                </ul>
+              ) : (
+                <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                  <li>5 stores (Chipotle Athens locations)</li>
+                  <li>200 SKUs across 8 categories</li>
+                  <li>60 days of sales and inventory history</li>
+                  <li>~8 anomalies, cycle counts (60% recent / 20% older), 0–12 transfer recommendations</li>
+                  <li>14 days hourly sales for Proteins, Salsas & Sauces, Produce; 4 sensors telemetry</li>
+                </ul>
+              )}
             </div>
 
             <button

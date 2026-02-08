@@ -177,6 +177,27 @@ export interface DemoStats {
   };
 }
 
+/** What the demo data generator will create (from GET /api/demo/preview) */
+export interface DemoPreview {
+  stores: number;
+  store_names: string[];
+  skus: number;
+  categories: string[];
+  days_history: number;
+  inventory_snapshots_approx: number;
+  receipt_chance_pct: number;
+  anomalies_approx: number;
+  cycle_recent_pct: number;
+  cycle_older_pct: number;
+  cycle_none_pct: number;
+  transfer_recommendations_approx: string;
+  sales_hourly_days: number;
+  sales_hourly_categories: string[];
+  sales_hourly_skus_per_store: number;
+  telemetry_sensors: number;
+  telemetry_description: string;
+}
+
 export interface HourlyForecast {
   hour: number;
   hour_display: string;
