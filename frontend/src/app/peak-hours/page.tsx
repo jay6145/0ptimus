@@ -1,5 +1,4 @@
 'use client';
-
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
@@ -54,8 +53,8 @@ export default function PeakHoursPage() {
       <main className="min-h-screen bg-gray-50 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto"></div>
-            <p className="mt-4 text-gray-600">Loading peak hour data...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-ncr-primary mx-auto"></div>
+            <p className="mt-4 text-ncr-gray-600">Loading peak hour data...</p>
           </div>
         </div>
       </main>
@@ -64,7 +63,7 @@ export default function PeakHoursPage() {
 
   if (error) {
     return (
-      <main className="min-h-screen bg-gray-50 p-8">
+      <main className="min-h-screen bg-ncr-gray-50 p-8">
         <div className="max-w-7xl mx-auto">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
             <h2 className="text-red-800 font-semibold mb-2">Error Loading Data</h2>
@@ -82,20 +81,20 @@ export default function PeakHoursPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-ncr-gray-50">
       {/* Header */}
-      <div className="ncr-header shadow-lg">
-        <div className="max-w-7xl mx-auto px-8 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-white">Peak Hour Forecasting</h1>
-              <p className="text-blue-100 mt-1">
-                Real-time demand prediction for lunch and dinner rushes
-              </p>
-            </div>
+      <div className="bg-gradient-purple text-white shadow-lg">
+  <div className="max-w-7xl mx-auto px-8 py-8">
+    <div className="flex items-center justify-between">
+      <div>
+        <h1 className="text-4xl font-bold mb-2">Peak Hour Forecasting</h1>
+        <p className="text-purple-100 text-lg">
+          Real-time demand prediction for lunch and dinner rushes
+        </p>
+      </div>
             <Link
               href="/"
-              className="px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 font-medium"
+              className="px-6 py-3 bg-white text-ncr-primary rounded-lg hover:bg-ncr-gray-100 transition-colors font-semibold shadow-lg"
             >
               ← Back to Overview
             </Link>
@@ -108,12 +107,12 @@ export default function PeakHoursPage() {
         {data && data.summary && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {/* Current Time Card */}
-            <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-primary-500">
+            <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-ncr-primary">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">Current Time</h2>
+                <h2 className="text-xl font-bold text-ncr-dark">Current Time</h2>
                 <div className="text-3xl">⏰</div>
               </div>
-              <p className="text-4xl font-bold text-primary-600">
+              <p className="text-4xl font-bold text-ncr-primary">
                 {formatTime(data.summary.current_time)}
               </p>
               <p className="text-sm text-gray-600 mt-2">
@@ -128,13 +127,13 @@ export default function PeakHoursPage() {
             </div>
 
             {/* Next Peak Countdown */}
-            <div className={`rounded-lg shadow-lg p-6 border-l-4 ${
+            <div className={`rounded-xl shadow-md p-6 border-l-4 ${
               data.summary.is_currently_peak 
                 ? 'bg-orange-50 border-orange-500' 
-                : 'bg-blue-50 border-blue-500'
+                : 'bg-ncr-primary-pale border-ncr-primary'
             }`}>
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-bold text-ncr-dark">
                   {data.summary.is_currently_peak ? 'Peak Period Active' : 'Next Peak Period'}
                 </h2>
                 <div className="text-3xl">
@@ -143,7 +142,7 @@ export default function PeakHoursPage() {
               </div>
               {!data.summary.is_currently_peak ? (
                 <>
-                  <p className="text-4xl font-bold text-blue-600">
+                  <p className="text-4xl font-bold text-ncr-primary">
                     {Math.floor(data.summary.minutes_until_peak / 60)}h {data.summary.minutes_until_peak % 60}m
                   </p>
                   <p className="text-sm text-gray-600 mt-2">
@@ -194,10 +193,10 @@ export default function PeakHoursPage() {
         )}
 
         {/* Prep Schedule */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-semibold text-gray-900">Today's Prep Schedule</h2>
-            <span className="px-3 py-1 bg-primary-100 text-primary-800 rounded-full text-sm font-medium">
+            <h2 className="text-2xl font-bold text-ncr-dark">Today's Prep Schedule</h2>
+            <span className="px-3 py-1 bg-ncr-primary-pale text-ncr-primary rounded-full text-sm font-semibold">
               {data?.total_prep_tasks || 0} Tasks
             </span>
           </div>
@@ -209,7 +208,7 @@ export default function PeakHoursPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="font-semibold text-gray-900">{prep.sku_name}</h3>
+                        <h3 className="font-bold text-ncr-dark">{prep.sku_name}</h3>
                         <span className="px-2 py-1 text-xs font-bold rounded uppercase">
                           {prep.priority}
                         </span>
@@ -232,7 +231,7 @@ export default function PeakHoursPage() {
                         <p className="text-2xl font-bold text-gray-900">
                           {Math.floor(prep.hours_until_prep)}h {Math.floor((prep.hours_until_prep % 1) * 60)}m
                         </p>
-                        <p className="text-xs text-gray-600">until prep time</p>
+                        <p className="text-xs text-ncr-gray-600">until prep time</p>
                       </div>
                     )}
                   </div>
@@ -250,15 +249,15 @@ export default function PeakHoursPage() {
         </div>
 
         {/* Critical Items Overview */}
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-4">Critical Items - Hourly Forecast</h2>
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <h2 className="text-2xl font-bold text-ncr-dark mb-4">Critical Items - Hourly Forecast</h2>
           
           <div className="space-y-6">
             {data?.critical_items.slice(0, 5).map((item, idx) => (
               <div key={idx} className="border rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">{item.sku_name}</h3>
+                    <h3 className="text-lg font-bold text-ncr-dark">{item.sku_name}</h3>
                     <p className="text-sm text-gray-600">{item.category} • On Hand: {item.on_hand} units</p>
                   </div>
                   {item.stockout_prediction.will_stockout && (
@@ -284,7 +283,7 @@ export default function PeakHoursPage() {
                             className={`w-full rounded-t ${
                               forecast.is_peak_hour 
                                 ? 'bg-orange-500' 
-                                : 'bg-blue-400'
+                                : 'bg-ncr-primary'
                             }`}
                             style={{ height: `${height}%` }}
                             title={`${forecast.hour_display}: ${forecast.predicted_demand} units`}
@@ -296,7 +295,7 @@ export default function PeakHoursPage() {
                   </div>
                   <div className="flex items-center justify-center space-x-4 mt-2 text-xs">
                     <div className="flex items-center">
-                      <div className="w-3 h-3 bg-blue-400 rounded mr-1"></div>
+                      <div className="w-3 h-3 bg-ncr-primary rounded mr-1"></div>
                       <span>Regular Hours</span>
                     </div>
                     <div className="flex items-center">
@@ -311,9 +310,9 @@ export default function PeakHoursPage() {
         </div>
 
         {/* Legend */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-semibold text-blue-900 mb-2">Peak Hours Definition</h3>
-          <div className="grid grid-cols-2 gap-4 text-sm text-blue-800">
+        <div className="mt-6 bg-ncr-primary-pale border border-ncr-primary rounded-lg p-4">
+          <h3 className="font-bold text-ncr-dark mb-2">Peak Hours Definition</h3>
+          <div className="grid grid-cols-2 gap-4 text-sm text-ncr-dark">
             <div>
               <span className="font-medium">Lunch Rush:</span> 11:00 AM - 2:00 PM
             </div>
