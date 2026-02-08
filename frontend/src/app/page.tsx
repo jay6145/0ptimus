@@ -163,27 +163,41 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-ncr-gray-50">
-      {/* Header */}
+      {/* Hero - Hackathon-ready */}
       <div className="bg-gradient-purple text-white">
-        <div className="max-w-7xl mx-auto px-8 py-8">
-          <h1 className="text-4xl font-bold mb-2">
+        <div className="max-w-7xl mx-auto px-8 py-10">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="px-3 py-1 bg-white/20 rounded-full text-xs font-semibold uppercase tracking-wide">
+              UGAHacks 11
+            </span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold mb-2">
             Inventory Health Dashboard
           </h1>
-          <p className="text-purple-100 text-lg">
-            Predictive inventory management with anomaly detection
+          <p className="text-purple-100 text-lg max-w-2xl mb-4">
+            Predict stockouts before they happen. Detect anomalies. Optimize cross-store transfers.
+          </p>
+          <p className="text-purple-200/90 text-sm">
+            Multi-store view • Live IoT sensors • Peak-hour prep • Transfer recommendations
           </p>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-8 py-6">
+        {/* Quick demo hint for judges */}
         {/* Alerts Bar */}
         {data && data.alerts && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-           <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-red-500 hover:shadow-lg transition-shadow">
+           <button
+              type="button"
+              onClick={() => setRiskOnly(true)}
+              className="bg-white rounded-xl shadow-md p-6 border-t-4 border-red-500 hover:shadow-lg transition-shadow text-left w-full focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2"
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-red-600 font-medium">Critical Stockouts</p>
                   <p className="text-2xl font-bold text-red-700">{data.alerts.critical_stockouts}</p>
+                  <p className="text-xs text-gray-500 mt-1">Click to filter</p>
                 </div>
                 <div className="text-red-400">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
@@ -191,7 +205,7 @@ export default function Home() {
                   </svg>
                 </div>
               </div>
-            </div>
+            </button>
 
             <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-yellow-500 hover:shadow-lg transition-shadow">
               <div className="flex items-center justify-between">
@@ -207,11 +221,15 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="bg-white rounded-xl shadow-md p-6 border-t-4 border-ncr-primary hover:shadow-lg transition-shadow">
+            <Link
+              href="/transfers"
+              className="bg-white rounded-xl shadow-md p-6 border-t-4 border-ncr-primary hover:shadow-lg transition-shadow block focus:outline-none focus:ring-2 focus:ring-ncr-primary focus:ring-offset-2"
+            >
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-ncr-primary font-medium">Transfer Opportunities</p>
                   <p className="text-2xl font-bold text-ncr-primary">{data.alerts.transfer_opportunities}</p>
+                  <p className="text-xs text-gray-500 mt-1">View transfers →</p>
                 </div>
                 <div className="text-ncr-primary">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 20 20">
@@ -219,7 +237,7 @@ export default function Home() {
                   </svg>
                 </div>
               </div>
-            </div>
+            </Link>
           </div>
         )}
 
@@ -317,15 +335,22 @@ export default function Home() {
           </div>
           
           {/* Info Note */}
-          <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded text-sm text-blue-800">
-            <span className="font-semibold">💡 Multi-Store View:</span> Each row represents inventory at a specific store. 
-            The same ingredient may appear multiple times because each store has different stock levels, demand, and risk. 
-            Use the store filter above to view a single location.
+          <div className="mt-3 space-y-2">
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+              <span className="font-semibold">Multi-Store View:</span> Each row is one store. Same ingredient can appear multiple times with different stock and risk. Use the store filter to narrow to one location.
+            </div>
+            <div className="p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-700">
+              <span className="font-semibold">Confidence score:</span> How much we trust that the on-hand number matches what’s actually on the shelf. A/B = recent count, few issues. C/D/F = consider a physical count (cycle count).
+            </div>
           </div>
         </div>
 
         {/* Inventory Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
+            <h2 className="text-lg font-bold text-ncr-dark">Inventory by Store</h2>
+            <p className="text-sm text-gray-600 mt-0.5">Click an ingredient for forecast, anomalies, and hourly demand</p>
+          </div>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-ncr-gray-100">
@@ -383,15 +408,19 @@ export default function Home() {
           </div>
 
           {data && data.items.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No inventory items found</p>
+            <div className="text-center py-12 px-6">
+              <p className="text-gray-500 mb-4">No inventory items found</p>
+              <Link href="/admin" className="inline-flex items-center px-4 py-2 bg-ncr-primary text-white rounded-lg hover:bg-ncr-primary-dark font-medium text-sm">
+                Regenerate demo data →
+              </Link>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="mt-6 text-center text-sm text-gray-500">
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm text-gray-500">
           <p>Showing {data?.items.length || 0} of {data?.total || 0} items</p>
+          <p className="text-ncr-primary font-medium">UGAHacks 11 • Optimus</p>
         </div>
       </div>
     </main>

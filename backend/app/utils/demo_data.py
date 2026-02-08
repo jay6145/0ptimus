@@ -348,27 +348,54 @@ def generate_demo_data(
         db.commit()
         print(f"✅ Injected {anomaly_count} anomalies")
         
-        # 6. Generate cycle counts
+        # 6. Generate cycle counts (more recent = better confidence scores / more A & B grades)
         print("📋 Generating cycle counts...")
-        count_coverage = 0.2  # 20% of SKUs counted
+        today = datetime.now().date()
         
         for store in stores:
-            counted_skus = random.sample(skus, int(len(skus) * count_coverage))
-            for sku in counted_skus:
-                count_date = start_date + timedelta(days=random.randint(0, days_history - 1))
-                
-                # Get expected inventory
+            # 60% of SKUs get a RECENT cycle count (within last 7 days) so scores spread to A/B
+            recent_counted = random.sample(skus, int(len(skus) * 0.6))
+            for sku in recent_counted:
+                count_date = today - timedelta(days=random.randint(1, 7))
                 snapshot = db.query(InventorySnapshot).filter(
                     InventorySnapshot.store_id == store.id,
                     InventorySnapshot.sku_id == sku.id,
                     InventorySnapshot.ts_date == count_date
                 ).first()
-                
+                if not snapshot:
+                    snapshot = db.query(InventorySnapshot).filter(
+                        InventorySnapshot.store_id == store.id,
+                        InventorySnapshot.sku_id == sku.id
+                    ).order_by(InventorySnapshot.ts_date.desc()).first()
                 if snapshot:
-                    # Count might differ slightly
+                    counted = snapshot.on_hand + random.randint(-2, 2)
+                    counted = max(0, counted)
+                    cycle_count = CycleCount(
+                        store_id=store.id,
+                        sku_id=sku.id,
+                        ts_date=count_date,
+                        counted_qty=counted
+                    )
+                    db.add(cycle_count)
+            
+            # 20% more get an older count (so some items stay C/D)
+            other_skus = [s for s in skus if s not in recent_counted]
+            older_counted = random.sample(other_skus, min(int(len(skus) * 0.2), len(other_skus))) if other_skus else []
+            for sku in older_counted:
+                count_date = start_date + timedelta(days=random.randint(days_history - 45, days_history - 1))
+                snapshot = db.query(InventorySnapshot).filter(
+                    InventorySnapshot.store_id == store.id,
+                    InventorySnapshot.sku_id == sku.id,
+                    InventorySnapshot.ts_date == count_date
+                ).first()
+                if not snapshot:
+                    snapshot = db.query(InventorySnapshot).filter(
+                        InventorySnapshot.store_id == store.id,
+                        InventorySnapshot.sku_id == sku.id
+                    ).order_by(InventorySnapshot.ts_date.desc()).first()
+                if snapshot:
                     counted = snapshot.on_hand + random.randint(-3, 3)
                     counted = max(0, counted)
-                    
                     cycle_count = CycleCount(
                         store_id=store.id,
                         sku_id=sku.id,

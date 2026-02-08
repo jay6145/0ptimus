@@ -7,12 +7,22 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from ..models import SalesHourly, InventorySnapshot, SKU, PrepRecommendation
 from functools import lru_cache
+from .forecasting import calculate_demand_forecast
 
 
 # Peak hour definitions for Chipotle
 LUNCH_HOURS = [11, 12, 13]  # 11am-2pm
 DINNER_HOURS = [17, 18, 19]  # 5pm-8pm
 PEAK_HOURS = LUNCH_HOURS + DINNER_HOURS
+
+# Default hourly distribution (Chipotle-style) when no SalesHourly data - used for fallback
+# Multipliers sum to ~17 so daily_demand / 17 gives base; then scale by multiplier
+HOURLY_DISTRIBUTION = {
+    6: 0.05, 7: 0.1, 8: 0.15, 9: 0.2, 10: 0.4,
+    11: 1.5, 12: 2.2, 13: 1.8, 14: 0.9, 15: 0.5, 16: 0.6,
+    17: 1.4, 18: 2.0, 19: 1.7, 20: 1.1, 21: 0.6, 22: 0.2,
+}
+HOURLY_DISTRIBUTION_SUM = sum(HOURLY_DISTRIBUTION.values())
 
 # Simple in-memory cache for hourly forecasts (TTL: 5 minutes)
 _forecast_cache = {}
@@ -251,7 +261,8 @@ def get_hourly_forecast_for_day(
     target_date: Optional[datetime] = None
 ) -> List[Dict]:
     """
-    Get hourly demand forecast for entire day
+    Get hourly demand forecast for entire day.
+    When no SalesHourly data exists for this SKU, fall back to distributing daily demand by hour.
     """
     if target_date is None:
         target_date = datetime.now()
@@ -273,6 +284,19 @@ def get_hourly_forecast_for_day(
             "peak_period": forecast["peak_period"],
             "confidence": forecast["confidence"]
         })
+    
+    # Fallback: if no hourly history (all zeros), distribute daily demand across hours
+    total_predicted = sum(f["predicted_demand"] for f in forecasts)
+    if total_predicted < 0.1:
+        daily_forecast = calculate_demand_forecast(db, store_id, sku_id)
+        daily_demand = daily_forecast.get("daily_demand") or 0.0
+        if daily_demand > 0:
+            for f in forecasts:
+                mult = HOURLY_DISTRIBUTION.get(f["hour"], 0.2)
+                f["predicted_demand"] = round(
+                    (daily_demand * mult / HOURLY_DISTRIBUTION_SUM), 1
+                )
+                f["confidence"] = "low"  # estimated from daily, not hourly history
     
     return forecasts
 

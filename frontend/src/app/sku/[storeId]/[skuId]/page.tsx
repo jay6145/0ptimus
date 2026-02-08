@@ -164,7 +164,7 @@ export default function SKUDetailPage() {
             <button
               onClick={loadHourlyForecast}
               disabled={hourlyLoading}
-              className="px-4 py-2 bg-primary-500 text-white rounded hover:bg-primary-600 disabled:bg-gray-400 text-sm font-medium"
+              className="px-4 py-2.5 bg-ncr-primary text-white rounded-lg hover:bg-ncr-primary-dark disabled:bg-gray-400 text-sm font-semibold shadow-sm"
             >
               {hourlyLoading ? 'Loading...' : showHourly ? 'Hide Hourly Forecast' : '⏰ View Hourly Forecast (Peak Hours)'}
             </button>
@@ -176,8 +176,13 @@ export default function SKUDetailPage() {
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-2">Hourly Demand Forecast</h2>
             <p className="text-sm text-gray-600 mb-4">
-              Predicted demand by hour - Peak hours (lunch 11am-2pm, dinner 5pm-8pm) highlighted in orange
+              Predicted demand by hour. Peak hours (lunch 11am–2pm, dinner 5pm–8pm) in orange.
             </p>
+            {hourlyData.hourly_forecast.every((f: any) => (f.predicted_demand || 0) === 0) && (
+              <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+                No hourly history for this SKU; values are estimated from daily demand. Items with hourly data (e.g. Proteins, Salsas) show actual patterns.
+              </div>
+            )}
 
             {/* Current Inventory Status */}
             <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded">
@@ -344,7 +349,10 @@ export default function SKUDetailPage() {
 
         {/* Confidence Details */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Confidence Score Breakdown</h2>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Confidence Score Breakdown</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            How much we trust that the on-hand number matches what’s on the shelf. Low score = schedule a physical count (cycle count).
+          </p>
           <div className="space-y-2">
             {data.confidence_details.deductions.map((deduction, idx) => (
               <div key={idx} className="flex items-center text-sm">
