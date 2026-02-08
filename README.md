@@ -9,7 +9,7 @@
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ```bash
 # Clone the repository
@@ -30,26 +30,26 @@ docker-compose up --build
 
 ---
 
-## 🎯 Key Features
+##  Key Features
 
 ### 1. **Stockout Prediction**
 - Predicts imminent stockouts 3-7 days in advance
 - Weighted demand forecasting with weekday/weekend patterns
 - Days-of-cover calculations with safety stock recommendations
 
-### 2. **Anomaly Detection + Confidence Scoring** ⭐
+### 2. **Anomaly Detection + Confidence Scoring** 
 - Detects unexplained inventory drops (shrink, theft, errors)
 - Provides plain-English explanations for every anomaly
 - Generates 0-100 confidence score for inventory accuracy
 - Prioritizes cycle counts based on risk
 
-### 3. **Cross-Store Transfer Optimizer** ⭐
+### 3. **Cross-Store Transfer Optimizer** 
 - Recommends inter-store transfers before placing new purchase orders
 - Distance-weighted algorithm minimizes transfer costs
 - Prevents stockouts faster and cheaper than new orders
 - Clear rationale for every recommendation
 
-### 4. **Peak Hour Forecasting** ⭐ NEW
+### 4. **Peak Hour Forecasting**  NEW
 - **Hourly demand prediction** for lunch (11am-2pm) and dinner (5pm-8pm) rushes
 - **Prep schedule generation** - tells staff exactly when and how much to prep
 - **Real-time stockout alerts** - "Chicken will run out at 12:45pm during lunch rush"
@@ -65,7 +65,7 @@ docker-compose up --build
 
 ---
 
-## 📊 Screenshots
+##  Screenshots
 
 ### Overview Dashboard
 ![Overview Dashboard](docs/screenshots/overview.png)
@@ -81,7 +81,7 @@ docker-compose up --build
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```mermaid
 graph TB
@@ -125,7 +125,7 @@ graph TB
 
 ---
 
-## 📖 Documentation
+##  Documentation
 
 - **[Technical Architecture](plans/technical-architecture.md)** - System design, algorithms, data model
 - **[Implementation Guide](plans/implementation-guide.md)** - Demo script, API examples, deployment
@@ -133,15 +133,15 @@ graph TB
 
 ---
 
-## 🎬 Demo Script (For Judges)
+##  Demo Script (For Judges)
 
-### Step 0: Peak Hours Dashboard (NEW - SHOW THIS FIRST!) ⭐
-1. Navigate to `http://localhost:3000/peak-hours` (or click "⏰ Peak Hours" button)
+### Step 0: Peak Hours Dashboard (NEW - SHOW THIS FIRST!) 
+1. Navigate to `http://localhost:3000/peak-hours` (or click " Peak Hours" button)
 2. **Current Time & Next Peak** shows:
    - Current time with countdown to next rush period
    - "Next peak: Lunch rush in 2h 15m" (or "LUNCH RUSH IN PROGRESS")
 3. **Critical Alerts** banner:
-   - "⚠️ 2 Items Will Stock Out During Peak Hours"
+   - "2 Items Will Stock Out During Peak Hours"
    - Shows which items and exact stockout times during rush
 4. **Today's Prep Schedule**:
    - "Prep 40 units Chicken by 10:30 AM" (CRITICAL - for lunch rush)
@@ -176,7 +176,7 @@ graph TB
    - Declining on-hand inventory
    - Higher sales on weekends (pattern detection)
    - Predicted stockout date: Feb 9, 2026
-3. **Click "⏰ View Hourly Forecast (Peak Hours)"** button:
+3. **Click " View Hourly Forecast (Peak Hours)"** button:
    - Shows hourly demand breakdown
    - Highlights peak hours in orange
    - Shows exact hour of stockout (e.g., "Will run out at 1:00 PM")
@@ -236,7 +236,7 @@ graph TB
 
 ---
 
-## 🧮 Core Algorithms
+##  Core Algorithms
 
 ### Demand Forecasting
 ```python
@@ -281,7 +281,7 @@ for receiver in sorted_by_urgency(receivers):
 
 ---
 
-## 🧪 Testing
+##  Testing
 
 ### Backend Tests
 ```bash
@@ -344,7 +344,7 @@ cp frontend/.env.local.example frontend/.env.local
 
 ---
 
-## 📡 API Endpoints
+##  API Endpoints
 
 ### Overview
 ```bash
@@ -390,58 +390,58 @@ Content-Type: application/json
 
 ---
 
-## 🎯 Judging Criteria Alignment
+##  Judging Criteria Alignment
 
 ### Innovation (35%)
-✅ **Anomaly Detection with Explainability**
+ **Anomaly Detection with Explainability**
 - Residual-based detection with plain-English explanations
 - Confidence scoring prioritizes actions
 - Detects shrink, receiving errors, systematic patterns
 
-✅ **Cross-Store Transfer Optimizer**
+ **Cross-Store Transfer Optimizer**
 - Prevents stockouts without new purchase orders
 - Distance-weighted algorithm minimizes costs
 - Clear ROI: Saves money, reduces waste, faster fulfillment
 
-✅ **Optional Arduino Integration** (future)
+ **Optional Arduino Integration** (future)
 - IoT sensors for real-time validation
 - Detects phantom inventory and spoilage risk
 
 ### Feasibility (30%)
-✅ **Straightforward Data Model**
+**Straightforward Data Model**
 - Standard retail concepts (stores, SKUs, sales, inventory)
 - SQLite for demo, PostgreSQL-ready for production
 - No complex dependencies
 
-✅ **Explainable Heuristics**
+**Explainable Heuristics**
 - Weighted moving average (not black-box ML)
 - Greedy matching (not complex optimization)
 - Judges can validate the logic
 
-✅ **Deployable Architecture**
+**Deployable Architecture**
 - Docker Compose for one-command startup
 - Cloud-ready (Vercel + Railway)
 - Scales to 100+ stores
 
 ### Customer Impact (35%)
-✅ **Fewer Stockouts**
+**Fewer Stockouts**
 - Predictive alerts 3-7 days in advance
 - Transfer recommendations prevent stockouts faster
 - **Target**: 50% reduction in stockout rate
 
-✅ **Less Phantom Inventory**
+**Less Phantom Inventory**
 - Anomaly detection catches shrink, theft, errors
 - Confidence scoring prioritizes cycle counts
 - **Target**: 95%+ inventory accuracy
 
-✅ **Less Manual Guesswork**
+**Less Manual Guesswork**
 - Automated demand forecasting
 - Automated transfer recommendations
 - **Target**: 2-3 hours saved per store manager per week
 
 ---
 
-## 📈 Success Metrics (Post-Deployment)
+##  Success Metrics (Post-Deployment)
 
 | Metric | Baseline | Target | Impact |
 |--------|----------|--------|--------|
@@ -456,7 +456,7 @@ Content-Type: application/json
 
 ---
 
-## 🚧 Future Enhancements
+##  Future Enhancements
 
 ### Phase 1: Enhanced ML
 - [ ] LSTM for demand forecasting (seasonal trends)
@@ -485,7 +485,7 @@ Content-Type: application/json
 
 ---
 
-## 🐛 Troubleshooting
+##  Troubleshooting
 
 ### Docker containers won't start
 ```bash
@@ -510,13 +510,13 @@ curl -X POST http://localhost:8000/api/demo/regenerate
 
 ---
 
-## 📝 License
+##  License
 
 MIT License - See [LICENSE](LICENSE) file for details
 
 ---
 
-## 👥 Team
+##  Team
 
 Built for UGAHacks 11 by [Your Team Name]
 
@@ -524,7 +524,7 @@ Built for UGAHacks 11 by [Your Team Name]
 
 ---
 
-## 🙏 Acknowledgments
+##  Acknowledgments
 
 - NCR Voyix for the hackathon challenge
 - FastAPI and Next.js communities
@@ -532,4 +532,4 @@ Built for UGAHacks 11 by [Your Team Name]
 
 ---
 
-**Ready to revolutionize inventory management? Let's go! 🚀**
+**Ready to revolutionize inventory management? Let's go! **
